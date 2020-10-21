@@ -11,7 +11,7 @@ Support: developer.dlio@gmail.com
 Function to send email for Delphi.
 
 
-Here is an example ![Samples](https://github.com/dliocode/SendEmail/tree/master/samples)
+Here is an example [Samples](https://github.com/dliocode/SendEmail/tree/main/samples)
 
 ```delphi
 uses
