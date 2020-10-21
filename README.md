@@ -10,8 +10,7 @@ Support: developer.dlio@gmail.com
 
 Function to send email for Delphi.
 
-
-Here is an example [Samples](https://github.com/dliocode/SendEmail/tree/main/samples)
+:fast_forward: Here is an example [Samples](https://github.com/dliocode/SendEmail/tree/main/samples)
 
 ## :warning: Usage
 
