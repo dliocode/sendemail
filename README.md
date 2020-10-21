@@ -1,6 +1,6 @@
 <p align="center"><br>
-  <img src="https://github.com/dliocode/SendEmail/blob/master/SendEmail.jpg"><br>
-</p>
+  <img src="https://github.com/dliocode/SendEmail/blob/main/SendEmail.jpg"><br>
+</p> 
 
 ## Send Email
 
