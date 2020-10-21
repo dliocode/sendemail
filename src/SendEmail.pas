@@ -8,9 +8,9 @@ uses
   System.TypInfo;
 
 type
-  TPriority              = IdMessage.TIdMessagePriority;
+  TPriority = IdMessage.TIdMessagePriority;
   TAttachmentDisposition = (adAttachment, adInline);
-  TLogMode               = (lmComponent, lmLib, lmAll, lmNone);
+  TLogMode = (lmComponent, lmLib, lmAll, lmNone);
 
   ISendEmail = interface
     ['{2B186D65-3B24-4D1B-B47F-9B145B59CD1F}']
@@ -43,29 +43,29 @@ type
 
   TSendEmail = class(TInterfacedObject, ISendEmail)
   private
-    FIdSMTP              : TIdSMTP;
-    FIdSSLOpenSSL        : TIdSSLIOHandlerSocketOpenSSL;
-    FIdMessage           : TIdMessage;
+    FIdSMTP: TIdSMTP;
+    FIdSSLOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
+    FIdMessage: TIdMessage;
     FidMessageBuilderHTML: TIdMessageBuilderHtml;
-    FSSL                 : Boolean;
-    FTLS                 : Boolean;
-    FLogExecute          : TProc<string>;
-    FLogMode             : TLogMode;
-    FWorkBegin           : TProc<Int64>;
-    FWork                : TProc<Int64>;
-    FWorkEnd             : TProc;
-    FMessageStream       : TMemoryStream;
+    FSSL: Boolean;
+    FTLS: Boolean;
+    FLogExecute: TProc<string>;
+    FLogMode: TLogMode;
+    FWorkBegin: TProc<Int64>;
+    FWork: TProc<Int64>;
+    FWorkEnd: TProc;
+    FMessageStream: TMemoryStream;
 
     FConnectMaxReconnection: Integer;
-    FConnectCountReconnect : Integer;
-    FSendMaxReconnection   : Integer;
-    FSendCountReconnect    : Integer;
+    FConnectCountReconnect: Integer;
+    FSendMaxReconnection: Integer;
+    FSendCountReconnect: Integer;
 
     function IsConnected: Boolean;
     procedure Reconnect(AResend: Boolean = False);
 
     procedure LogSMTPStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
-    procedure LogSSLStatus(const AMsg: String);
+    procedure LogSSLStatus(const AMsg: string);
     procedure Log(const ALog: string; const AForced: Boolean = False);
 
     procedure WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
@@ -115,24 +115,24 @@ end;
 
 constructor TSendEmail.Create;
 begin
-  FIdSMTP               := TIdSMTP.Create(nil);
-  FIdSSLOpenSSL         := TIdSSLIOHandlerSocketOpenSSL.Create(FIdSMTP);
+  FIdSMTP := TIdSMTP.Create(nil);
+  FIdSSLOpenSSL := TIdSSLIOHandlerSocketOpenSSL.Create(FIdSMTP);
   FidMessageBuilderHTML := TIdMessageBuilderHtml.Create;
-  FIdMessage            := TIdMessage.Create(nil);
-  FMessageStream        := TMemoryStream.Create;
+  FIdMessage := TIdMessage.Create(nil);
+  FMessageStream := TMemoryStream.Create;
 
   FLogExecute := nil;
-  FLogMode    := lmNone;
+  FLogMode := lmNone;
 
   FWorkBegin := nil;
-  FWork      := nil;
-  FWorkEnd   := nil;
+  FWork := nil;
+  FWorkEnd := nil;
 
   FConnectMaxReconnection := 5;
-  FConnectCountReconnect  := 0;
+  FConnectCountReconnect := 0;
 
   FSendMaxReconnection := 5;
-  FSendCountReconnect  := 0;
+  FSendCountReconnect := 0;
 
   Auth(True);
   SSL(False);
@@ -143,39 +143,39 @@ begin
   with FIdSMTP do
   begin
     ConnectTimeout := 60000;
-    ReadTimeout    := 60000;
-    HeloName       := 'SendEmail';
-    OnStatus       := LogSMTPStatus;
-    OnWorkBegin    := WorkBegin;
-    OnWork         := Work;
-    OnWorkEnd      := WorkEnd;
+    ReadTimeout := 60000;
+    HeloName := 'SendEmail';
+    OnStatus := LogSMTPStatus;
+    OnWorkBegin := WorkBegin;
+    OnWork := Work;
+    OnWorkEnd := WorkEnd;
   end;
 
   with FIdSSLOpenSSL do
   begin
-    ConnectTimeout         := 100000;
-    ReadTimeout            := 100000;
+    ConnectTimeout := 100000;
+    ReadTimeout := 100000;
     SSLOptions.SSLVersions := [SslvSSLv2, SslvSSLv23, SslvSSLv3, SslvTLSv1, SslvTLSv1_1, SslvTLSv1_2];
-    SSLOptions.Mode        := SslmBoth;
-    SSLOptions.VerifyMode  := [];
+    SSLOptions.Mode := SslmBoth;
+    SSLOptions.VerifyMode := [];
     SSLOptions.VerifyDepth := 0;
-    PassThrough            := False;
-    OnStatus               := LogSMTPStatus;
-    OnStatusInfo           := LogSSLStatus;
+    PassThrough := False;
+    OnStatus := LogSMTPStatus;
+    OnStatusInfo := LogSSLStatus;
   end;
 
   with FIdMessage do
   begin
-    IsEncoded     := True;
+    IsEncoded := True;
     UseNowForDate := True;
   end;
 end;
 
 destructor TSendEmail.Destroy;
 begin
-  FWorkBegin  := nil;
-  FWork       := nil;
-  FWorkEnd    := nil;
+  FWorkBegin := nil;
+  FWork := nil;
+  FWorkEnd := nil;
   FLogExecute := nil;
 
   FreeAndNil(FMessageStream);
@@ -194,7 +194,7 @@ begin
   if AEmail.Trim.IsEmpty then
     Exit;
 
-  FIdMessage.From.Name    := AName;
+  FIdMessage.From.Name := AName;
   FIdMessage.From.Address := AEmail;
 
   Log(Format('From: %s', [AEmail]));
@@ -209,7 +209,7 @@ begin
 
   with FIdMessage.Recipients.Add do
   begin
-    Name    := AName;
+    name := AName;
     Address := AEmail;
   end;
 
@@ -223,7 +223,7 @@ begin
   if AEmail.Trim.IsEmpty then
     Exit;
 
-  FIdMessage.ReceiptRecipient.Name    := AName;
+  FIdMessage.ReceiptRecipient.Name := AName;
   FIdMessage.ReceiptRecipient.Address := AEmail;
 
   Log(Format('ReceiptRecipient: %s', [AEmail]));
@@ -238,7 +238,7 @@ begin
 
   with FIdMessage.ReplyTo.Add do
   begin
-    Name    := AName;
+    name := AName;
     Address := AEmail;
   end;
 
@@ -254,7 +254,7 @@ begin
 
   with FIdMessage.CCList.Add do
   begin
-    Name    := AName;
+    name := AName;
     Address := AEmail;
   end;
 
@@ -270,7 +270,7 @@ begin
 
   with FIdMessage.BCCList.Add do
   begin
-    Name    := AName;
+    name := AName;
     Address := AEmail;
   end;
 
@@ -279,7 +279,7 @@ end;
 
 function TSendEmail.Priority(const APriority: TPriority): ISendEmail;
 begin
-  Result              := Self;
+  Result := Self;
   FIdMessage.Priority := APriority;
 
   Log(Format('Priority: %s', [GetEnumName(TypeInfo(TPriority), Integer(APriority))]));
@@ -287,7 +287,7 @@ end;
 
 function TSendEmail.Subject(const ASubject: string): ISendEmail;
 begin
-  Result             := Self;
+  Result := Self;
   FIdMessage.Subject := ASubject;
 
   Log(Format('Subject: %s', [ASubject]));
@@ -300,13 +300,13 @@ begin
   if IsBodyHTML then
   begin
     FidMessageBuilderHTML.Html.Add(ABody);
-    FidMessageBuilderHTML.HtmlCharSet         := 'utf-8';
+    FidMessageBuilderHTML.HtmlCharSet := 'utf-8';
     FidMessageBuilderHTML.HtmlContentTransfer := 'base64'; // quoted-printable
   end
   else
   begin
     FidMessageBuilderHTML.PlainText.Add(ABody);
-    FidMessageBuilderHTML.PlainTextCharSet         := 'utf-8';
+    FidMessageBuilderHTML.PlainTextCharSet := 'utf-8';
     FidMessageBuilderHTML.PlainTextContentTransfer := 'base64'; // quoted-printable
   end;
 end;
@@ -340,14 +340,14 @@ end;
 
 function TSendEmail.Host(const AHost: string): ISendEmail;
 begin
-  Result       := Self;
+  Result := Self;
   FIdSMTP.Host := AHost;
   Log(Format('Host: %s', [AHost]));
 end;
 
 function TSendEmail.Port(const APort: Integer): ISendEmail;
 begin
-  Result       := Self;
+  Result := Self;
   FIdSMTP.Port := APort;
   Log(Format('Port: %d', [APort]));
 end;
@@ -366,14 +366,14 @@ end;
 
 function TSendEmail.UserName(const AUserName: string): ISendEmail;
 begin
-  Result           := Self;
+  Result := Self;
   FIdSMTP.UserName := AUserName;
   Log(Format('UserName: %s', [AUserName]));
 end;
 
 function TSendEmail.Password(const APassword: string): ISendEmail;
 begin
-  Result           := Self;
+  Result := Self;
   FIdSMTP.Password := APassword;
   Log(Format('Password: %s', ['********']));
 end;
@@ -381,13 +381,13 @@ end;
 function TSendEmail.SSL(const AValue: Boolean): ISendEmail;
 begin
   Result := Self;
-  FSSL   := AValue;
+  FSSL := AValue;
 end;
 
 function TSendEmail.TLS(const AValue: Boolean): ISendEmail;
 begin
   Result := Self;
-  FTLS   := AValue;
+  FTLS := AValue;
 end;
 
 function TSendEmail.Clear: ISendEmail;
@@ -433,8 +433,8 @@ begin
         SSLOptions.Method := SslvTLSv1_2;
 
       Destination := FIdSMTP.Host + ':' + FIdSMTP.Port.ToString;
-      Host        := FIdSMTP.Host;
-      Port        := FIdSMTP.Port;
+      Host := FIdSMTP.Host;
+      Port := FIdSMTP.Port;
     end;
 
     FIdSMTP.IOHandler := FIdSSLOpenSSL;
@@ -448,7 +448,7 @@ begin
   begin
     Log('Defining encryption: None');
     FIdSMTP.IOHandler := nil;
-    FIdSMTP.UseTLS    := UtNoTLSSupport;
+    FIdSMTP.UseTLS := UtNoTLSSupport;
   end;
 
   try
@@ -593,24 +593,24 @@ begin
   Result := Self;
 
   FLogExecute := AStatus;
-  FLogMode    := ALogMode;
+  FLogMode := ALogMode;
 end;
 
 function TSendEmail.OnWorkBegin(const AExecute: TProc<Int64>): ISendEmail;
 begin
-  Result     := Self;
+  Result := Self;
   FWorkBegin := AExecute;
 end;
 
 function TSendEmail.OnWork(const AExecute: TProc<Int64>): ISendEmail;
 begin
   Result := Self;
-  FWork  := AExecute;
+  FWork := AExecute;
 end;
 
 function TSendEmail.OnWorkEnd(const AExecute: TProc): ISendEmail;
 begin
-  Result   := Self;
+  Result := Self;
   FWorkEnd := AExecute;
 end;
 
@@ -644,7 +644,7 @@ begin
     FLogExecute(AStatusText);
 end;
 
-procedure TSendEmail.LogSSLStatus(const AMsg: String);
+procedure TSendEmail.LogSSLStatus(const AMsg: string);
 begin
   if Assigned(FLogExecute) and (FLogMode in [lmComponent, lmAll]) then
     FLogExecute(AMsg);
