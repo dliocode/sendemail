@@ -2,7 +2,7 @@
   <img src="https://github.com/dliocode/SendEmail/blob/main/SendEmail.jpg"><br>
 </p> 
 
-## Send Email
+## :mailbox: Send Email
 
 ![](https://img.shields.io/github/stars/dliocode/SendEmail.svg) ![](https://img.shields.io/github/forks/dliocode/SendEmail.svg) ![](https://img.shields.io/github/v/tag/dliocode/SendEmail.svg) ![](https://img.shields.io/github/release/dliocode/SendEmail.svg) ![](https://img.shields.io/github/issues/dliocode/SendEmail.svg)
 
@@ -12,6 +12,10 @@ Function to send email for Delphi.
 
 
 Here is an example [Samples](https://github.com/dliocode/SendEmail/tree/main/samples)
+
+## :warning: Usage
+
+### :green_book: Mode: Simple
 
 ```delphi
 uses
@@ -40,8 +44,7 @@ begin
 end.
 ```
 
-
-With add logger.
+### :orange_book: Mode: With logger
 
 ```delphi
 uses
@@ -76,7 +79,7 @@ begin
 end. 
 ```
 
-With add progressbar
+### :closed_book: Mode: With process bar
 
 ```delphi
 uses
@@ -125,3 +128,68 @@ begin
   .Send(True) // True is Default = After sending it will be disconnected
 end.
 ```
+
+## :satellite: Host SMTP
+
+### GMAIL
+
+| Host | Port | Cryptography | Auth |
+| -------------- | --- | ------- | --- |
+| smtp.gmail.com | 465 | SSL/TLS | Yes |
+
+
+### Outlook or Office 365
+
+| Host | Port | Cryptography | Auth |
+| ------------------ | --- | --- | --- |
+| smtp.office365.com | 587 | TLS | Yes |
+
+
+### HOTMAIL
+
+| Host | Port | Cryptography | Auth |
+| ------------- | --- | --- | --- |
+| smtp.live.com | 587 | TLS | Yes |
+
+
+### Yahoo
+
+| Host | Port | Cryptography | Auth |
+| ---------------------- | --- | --- | --- |
+| smtp.mail.yahoo.com.br | 587 | TLS | Yes |
+
+
+### SendGrid
+
+| Host | Port | Cryptography | Auth |
+| ----------------- | --- | --- | --- |
+| smtp.sendgrid.net | 465 | TLS | Yes |
+
+
+### Localweb
+
+| Host | Port | Cryptography | Auth |
+| ---------------- | --- | --- | --- |
+| email-ssl.com.br | 465 | TLS | Yes |
+
+
+### SparkPost
+
+| Host | Port | Cryptography | Auth |
+| ---------------------- | --- | --- | --- |
+| smtp.sparkpostmail.com | 587 | TLS | Yes |
+
+
+### Elastic Email
+
+| Host | Port | Cryptography | Auth |
+| --------------------- | --- | ---- | --- |
+| smtp.elasticemail.com | 587 | None | Yes |
+
+
+### Mail
+
+| Host | Port | Cryptography | Auth |
+| ------------ | --- | ------- | --- |
+| smtp.mail.ru | 465 | SSL/TLS | Yes |
+
