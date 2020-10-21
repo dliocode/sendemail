@@ -4,7 +4,7 @@
 
 ## Send Email
 
-![](https://img.shields.io/github/stars/dliocode/SendEmail.svg) ![](https://img.shields.io/github/forks/dliocode/SendEmail.svg) ![](https://img.shields.io/github/tag/dliocode/SendEmail.svg) ![](https://img.shields.io/github/release/dliocode/SendEmail.svg) ![](https://img.shields.io/github/issues/dliocode/SendEmail.svg)
+![](https://img.shields.io/github/stars/dliocode/SendEmail.svg) ![](https://img.shields.io/github/forks/dliocode/SendEmail.svg) ![](https://img.shields.io/github/v/tag/dliocode/SendEmail.svg) ![](https://img.shields.io/github/release/dliocode/SendEmail.svg) ![](https://img.shields.io/github/issues/dliocode/SendEmail.svg)
 
 Support: developer.dlio@gmail.com
 
