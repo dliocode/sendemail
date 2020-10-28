@@ -51,30 +51,30 @@ uses
 
 begin
   TSendEmail.New
-  .OnLog(
-   procedure(ALog: string)
-      begin
-        memoLog.Lines.Add(Format('%s ' + ALog, [FormatDateTime('dd/mm/yyyy hh:MM:ss', Now)]));
-      end,
-      TLogMode.lmLib) // Options: lmComponent, lmLib, lmAll, lmNone  
-  .From('Email','Name')
-  .AddTo('Email','Name')
-  .AddReceiptRecipient('Email','Name') // Confirmation Read
-  .AddReplyTo('Email','Name') // Answer to
-  .AddCC('Email','Name')
-  .AddBCC('Email','Name')
-  .Priority(TIdMessagePriority.mpNormal)
-  .Subject('My Text with SendEmail')
-  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
-  .AddAttachment('')
-  .Host('email@domain.com')
-  .Port(587)
-  .Auth(True)
-  .UserName('username')
-  .Password('password')
-  .SSL(False)
-  .TLS(False)
-  .Send(True); // True is Default = After sending it will be disconnected
+    .OnLog(
+    procedure(ALog: string)
+    begin
+      memoLog.Lines.Add(Format('%s ' + ALog, [FormatDateTime('dd/mm/yyyy hh:MM:ss', Now)]));
+    end,
+    TLogMode.lmLib) // Options: lmComponent, lmLib, lmAll, lmNone
+    .From('Email', 'Name')
+    .AddTo('Email', 'Name')
+    .AddReceiptRecipient('Email', 'Name') // Confirmation Read
+    .AddReplyTo('Email', 'Name')          // Answer to
+    .AddCC('Email', 'Name')
+    .AddBCC('Email', 'Name')
+    .Priority(TIdMessagePriority.mpNormal)
+    .Subject('My Text with SendEmail')
+    .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
+    .AddAttachment('')
+    .Host('email@domain.com')
+    .Port(587)
+    .Auth(True)
+    .UserName('username')
+    .Password('password')
+    .SSL(False)
+    .TLS(False)
+    .Send(True); // True is Default = After sending it will be disconnected
 end. 
 ```
 
@@ -85,42 +85,44 @@ uses
   SendEmail;
 
 begin
-  TSendEmail.New  
-  .OnWorkBegin(
-  procedure(ACountMax: Int64)
-  begin
-	ProgressBar.Position := 0;     
-	ProgressBar.Max := ACountMax;
-  end)
-  .OnWork(
-  procedure(ACount: Int64)
-  begin
-	ProgressBar.Position := ACount;
-	ProgressBar.Refresh;
-  end)
-  .OnWorkEnd(
-  procedure
-  begin
-	ProgressBar.Position := ProgressBar.Max;
-  end)    
-  .From('Email','Name')
-  .AddTo('Email','Name')
-  .AddReceiptRecipient('Email','Name') // Confirmation Read
-  .AddReplyTo('Email','Name') // Answer to
-  .AddCC('Email','Name')
-  .AddBCC('Email','Name')
-  .Priority(TIdMessagePriority.mpNormal)
-  .Subject('My Text with SendEmail')
-  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
-  .AddAttachment('')
-  .Host('email@domain.com')
-  .Port(587)
-  .Auth(True)
-  .UserName('username')
-  .Password('password')
-  .SSL(False)
-  .TLS(False)
-  .Send(True) // True is Default = After sending it will be disconnected
+  TSendEmail.New
+    .OnWorkBegin(
+    procedure(ACountMax: Int64)
+    begin
+      ProgressBar.Max := ACountMax;
+      ProgressBar.Position := 0;
+      ProgressBar.Refresh;
+    end)
+    .OnWork(
+    procedure(ACount: Int64)
+    begin
+      ProgressBar.Position := ACount;
+      ProgressBar.Refresh;
+    end)
+    .OnWorkEnd(
+    procedure
+    begin
+      ProgressBar.Position := ProgressBar.Max;
+      ProgressBar.Refresh;
+    end)
+    .From('Email', 'Name')
+    .AddTo('Email', 'Name')
+    .AddReceiptRecipient('Email', 'Name') // Confirmation Read
+    .AddReplyTo('Email', 'Name')          // Answer to
+    .AddCC('Email', 'Name')
+    .AddBCC('Email', 'Name')
+    .Priority(TIdMessagePriority.mpNormal)
+    .Subject('My Text with SendEmail')
+    .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
+    .AddAttachment('')
+    .Host('email@domain.com')
+    .Port(587)
+    .Auth(True)
+    .UserName('username')
+    .Password('password')
+    .SSL(False)
+    .TLS(False)
+    .Send(True); // True is Default = After sending it will be disconnected
 end.
 ```
 
@@ -132,25 +134,25 @@ uses
 
 begin
   TSendEmail.New
-  .From('Email','Name')
-  .AddTo('Email','Name')
-  .AddReceiptRecipient('Email','Name') // Confirmation Read
-  .AddReplyTo('Email','Name') // Answer to
-  .AddCC('Email','Name')
-  .AddBCC('Email','Name')
-  .Priority(TIdMessagePriority.mpNormal)
-  .Subject('My Text with SendEmail')
-  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
-  .AddAttachment('')
-  .Host('email@domain.com')
-  .Port(587)
-  .Auth(True)
-  .UserName('username')
-  .Password('password')
-  .SSL(False)
-  .TLS(False)
-  .SendAsync( 
-    procedure(AErro: Boolean; AMessageErro: string)  // Informed callback to return
+    .From('Email', 'Name')
+    .AddTo('Email', 'Name')
+    .AddReceiptRecipient('Email', 'Name') // Confirmation Read
+    .AddReplyTo('Email', 'Name')          // Answer to
+    .AddCC('Email', 'Name')
+    .AddBCC('Email', 'Name')
+    .Priority(TIdMessagePriority.mpNormal)
+    .Subject('My Text with SendEmail')
+    .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
+    .AddAttachment('')
+    .Host('email@domain.com')
+    .Port(587)
+    .Auth(True)
+    .UserName('username')
+    .Password('password')
+    .SSL(False)
+    .TLS(False)
+    .SendAsync(
+    procedure(AErro: Boolean; AMessageErro: string) // Informed callback to return
     begin
       if AErro then
         ShowMessage(AMessageErro)
