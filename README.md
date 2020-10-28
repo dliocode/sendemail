@@ -22,24 +22,24 @@ uses
 
 begin
   TSendEmail.New
-  .From('Email','Name')
-  .AddTo('Email','Name')
-  .AddReceiptRecipient('Email','Name') // Confirmation Read
-  .AddReplyTo('Email','Name') // Answer to
-  .AddCC('Email','Name')
-  .AddBCC('Email','Name')
-  .Priority(TIdMessagePriority.mpNormal)
-  .Subject('My Text with SendEmail')
-  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
-  .AddAttachment('')
-  .Host('email@domain.com')
-  .Port(587)
-  .Auth(True)
-  .UserName('username')
-  .Password('password')
-  .SSL(False)
-  .TLS(False)
-  .Send(True); // True is Default = After sending it will be disconnected
+    .From('Email', 'Name')
+    .AddTo('Email', 'Name')
+    .AddReceiptRecipient('Email', 'Name') // Confirmation Read
+    .AddReplyTo('Email', 'Name')          // Answer to
+    .AddCC('Email', 'Name')
+    .AddBCC('Email', 'Name')
+    .Priority(TIdMessagePriority.mpNormal)
+    .Subject('My Text with SendEmail')
+    .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
+    .AddAttachment('')
+    .Host('email@domain.com')
+    .Port(587)
+    .Auth(True)
+    .UserName('username')
+    .Password('password')
+    .SSL(False)
+    .TLS(False)
+    .Send(True); // True is Default = After sending it will be disconnected
 end.
 ```
 
