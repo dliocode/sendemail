@@ -122,7 +122,7 @@ begin
         ShowMessage(AMessageErro)
       else
         ShowMessage('Message sent!')
-    end, True);
+    end);
 end;
 
 procedure TFormSendEmail.btnSendClick(Sender: TObject);
@@ -132,7 +132,7 @@ begin
   LoadSettings;
 
   try
-    TSendEmail.New.Send(True);
+    TSendEmail.New.Send;
   except
     on E: exception do
     begin

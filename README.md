@@ -28,7 +28,7 @@ begin
     .AddReplyTo('Email', 'Name')          // Answer to
     .AddCC('Email', 'Name')
     .AddBCC('Email', 'Name')
-    .Priority(TIdMessagePriority.mpNormal)
+    .Priority(TPriority.mpNormal)
     .Subject('My Text with SendEmail')
     .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
     .AddAttachment('')
@@ -63,7 +63,7 @@ begin
     .AddReplyTo('Email', 'Name')          // Answer to
     .AddCC('Email', 'Name')
     .AddBCC('Email', 'Name')
-    .Priority(TIdMessagePriority.mpNormal)
+    .Priority(TPriority.mpNormal)
     .Subject('My Text with SendEmail')
     .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
     .AddAttachment('')
@@ -111,7 +111,7 @@ begin
     .AddReplyTo('Email', 'Name')          // Answer to
     .AddCC('Email', 'Name')
     .AddBCC('Email', 'Name')
-    .Priority(TIdMessagePriority.mpNormal)
+    .Priority(TPriority.mpNormal)
     .Subject('My Text with SendEmail')
     .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
     .AddAttachment('')
@@ -140,7 +140,7 @@ begin
     .AddReplyTo('Email', 'Name')          // Answer to
     .AddCC('Email', 'Name')
     .AddBCC('Email', 'Name')
-    .Priority(TIdMessagePriority.mpNormal)
+    .Priority(TPriority.mpNormal)
     .Subject('My Text with SendEmail')
     .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
     .AddAttachment('')

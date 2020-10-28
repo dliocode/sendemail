@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.StrUtils, System.Classes, System.TypInfo, System.Threading, System.SyncObjs,
-  IdSMTP, IdSSL, IdSSLOpenSSL, IdSSLOpenSSLHeaders, IdExplicitTLSClientServerBase, IdMessage, IdMessageBuilder, idGlobal, IdComponent, IdAttachmentFile;
+  IdSMTP, IdSSL, IdSSLOpenSSL, IdSSLOpenSSLHeaders, IdExplicitTLSClientServerBase, IdIOHandler, IdMessage, IdMessageBuilder, idGlobal, IdComponent, IdAttachmentFile;
 
 type
   TPriority = IdMessage.TIdMessagePriority;
@@ -131,24 +131,27 @@ begin
 
   with FIdSMTP do
   begin
+    MailAgent := 'SendEmail';
     ConnectTimeout := 60000;
     ReadTimeout := 60000;
+    UseEhlo := True;
     HeloName := 'SendEmail';
     OnStatus := LogSMTPStatus;
     OnWorkBegin := WorkBegin;
     OnWork := Work;
     OnWorkEnd := WorkEnd;
+    ManagedIOHandler := True;
   end;
 
   with FIdSSLOpenSSL do
   begin
     ConnectTimeout := 100000;
     ReadTimeout := 100000;
+    PassThrough := True;
     SSLOptions.SSLVersions := [SslvSSLv2, SslvSSLv23, SslvSSLv3, SslvTLSv1, SslvTLSv1_1, SslvTLSv1_2];
     SSLOptions.Mode := SslmBoth;
     SSLOptions.VerifyMode := [];
     SSLOptions.VerifyDepth := 0;
-    PassThrough := False;
     OnStatus := LogSMTPStatus;
     OnStatusInfo := LogSSLStatus;
   end;
@@ -182,6 +185,12 @@ begin
 
   if AEmail.Trim.IsEmpty then
     Exit;
+
+  if IsConnected then
+    if not FIdMessage.From.Address.Contains(AEmail) then
+      Disconnect
+    else
+      Exit;
 
   FIdMessage.From.Name := AName;
   FIdMessage.From.Address := AEmail;
@@ -269,6 +278,10 @@ end;
 function TSendEmail.Priority(const APriority: TPriority): TSendEmail;
 begin
   Result := Self;
+
+  if FIdMessage.Priority = APriority then
+    Exit;
+
   FIdMessage.Priority := APriority;
 
   Log(Format('Priority: %s', [GetEnumName(TypeInfo(TPriority), Integer(APriority))]));
@@ -277,7 +290,11 @@ end;
 function TSendEmail.Subject(const ASubject: string): TSendEmail;
 begin
   Result := Self;
-  FIdMessage.Subject := ASubject;
+
+  if not FIdMessage.Subject.Contains(ASubject) then
+    FIdMessage.Subject := ASubject
+  else
+    Exit;
 
   Log(Format('Subject: %s', [ASubject]));
 end;
@@ -298,6 +315,8 @@ begin
     FidMessageBuilderHTML.PlainTextCharSet := 'utf-8';
     FidMessageBuilderHTML.PlainTextContentTransfer := 'base64'; // quoted-printable
   end;
+
+  Log(Format('Message: %s', [IfThen(IsBodyHTML, 'HTML', 'PlainText')]));
 end;
 
 function TSendEmail.AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): TSendEmail;
@@ -309,7 +328,7 @@ begin
 
   if not FileExists(AFileName) then
   begin
-    Log('Attachment not found');
+    Log('Attachment: Not found');
     Exit;
   end;
 
@@ -330,14 +349,30 @@ end;
 function TSendEmail.Host(const AHost: string): TSendEmail;
 begin
   Result := Self;
+
+  if IsConnected then
+    if not FIdSMTP.Host.Contains(AHost) then
+      Disconnect
+    else
+      Exit;
+
   FIdSMTP.Host := AHost;
+
   Log(Format('Host: %s', [AHost]));
 end;
 
 function TSendEmail.Port(const APort: Integer): TSendEmail;
 begin
   Result := Self;
+
+  if IsConnected then
+    if not FIdSMTP.Port = APort then
+      Disconnect
+    else
+      Exit;
+
   FIdSMTP.Port := APort;
+
   Log(Format('Port: %d', [APort]));
 end;
 
@@ -356,14 +391,30 @@ end;
 function TSendEmail.UserName(const AUserName: string): TSendEmail;
 begin
   Result := Self;
+
+  if IsConnected then
+    if not FIdSMTP.UserName.Contains(AUserName) then
+      Disconnect
+    else
+      Exit;
+
   FIdSMTP.UserName := AUserName;
+
   Log(Format('UserName: %s', [AUserName]));
 end;
 
 function TSendEmail.Password(const APassword: string): TSendEmail;
 begin
   Result := Self;
+
+  if IsConnected then
+    if not FIdSMTP.Password.Contains(APassword) then
+      Disconnect
+    else
+      Exit;
+
   FIdSMTP.Password := APassword;
+
   Log(Format('Password: %s', ['********']));
 end;
 
@@ -382,6 +433,9 @@ end;
 function TSendEmail.Clear: TSendEmail;
 begin
   Result := Self;
+
+  if IsConnected then
+    Disconnect;
 
   FIdMessage.ClearHeader;
   FIdMessage.Body.Clear;
@@ -428,7 +482,7 @@ begin
 
     FIdSMTP.IOHandler := FIdSSLOpenSSL;
 
-    if (MatchText(FIdSMTP.Port.ToString, ['25', '587'])) then
+    if (MatchText(FIdSMTP.Port.ToString, ['25', '587', '2587'])) then
       FIdSMTP.UseTLS := utUseExplicitTLS
     else
       FIdSMTP.UseTLS := utUseImplicitTLS;
@@ -436,7 +490,7 @@ begin
   else
   begin
     Log('Defining encryption: None');
-    FIdSMTP.IOHandler := nil;
+    FIdSMTP.IOHandler := TIdIOHandler.MakeDefaultIOHandler(nil);
     FIdSMTP.UseTLS := UtNoTLSSupport;
   end;
 
@@ -641,7 +695,22 @@ end;
 
 function TSendEmail.IsConnected: Boolean;
 begin
-  Result := FIdSMTP.Connected;
+  Result := False;
+
+  try
+    Result := FIdSMTP.Connected;
+  except
+    on E: Exception do
+      if E.Message.ToUpper.Contains('SSL3_GET_RECORD') then
+      begin
+        try
+          Reconnect(False);
+          Result := True;
+        except
+          Exit;
+        end;
+      end;
+  end;
 end;
 
 procedure TSendEmail.Reconnect(AResend: Boolean = False);
@@ -660,19 +729,19 @@ end;
 procedure TSendEmail.LogSMTPStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
 begin
   if Assigned(FLogExecute) and (FLogMode in [lmComponent, lmAll]) then
-    FLogExecute(AStatusText);
+    FLogExecute('SMTP: ' + AStatusText);
 end;
 
 procedure TSendEmail.LogSSLStatus(const AMsg: string);
 begin
   if Assigned(FLogExecute) and (FLogMode in [lmComponent, lmAll]) then
-    FLogExecute(AMsg);
+    FLogExecute('SSL: ' + AMsg.ToUpper.Replace('SSL STATUS: ', ''));
 end;
 
 procedure TSendEmail.Log(const ALog: string; const AForced: Boolean = False);
 begin
   if Assigned(FLogExecute) and ((FLogMode in [lmLib, lmAll]) or AForced) and not(FLogMode = lmNone) then
-    FLogExecute(ALog);
+    FLogExecute('LIB: ' + ALog);
 end;
 
 procedure TSendEmail.WorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
