@@ -49,7 +49,7 @@ object FormSendEmail: TFormSendEmail
       Top = 0
       Width = 494
       Height = 435
-      ActivePage = tabConfiguration
+      ActivePage = tabRecipient
       Align = alClient
       TabOrder = 0
       object tabConfiguration: TTabSheet
@@ -570,7 +570,7 @@ object FormSendEmail: TFormSendEmail
             Left = 387
             Top = 306
             Width = 83
-            Height = 87
+            Height = 42
             Anchors = [akTop, akRight]
             Caption = 'Send'
             TabOrder = 11
@@ -602,6 +602,16 @@ object FormSendEmail: TFormSendEmail
               'mpNormal'
               'mpLow'
               'mpLowest')
+          end
+          object btnSendAsync: TButton
+            Left = 387
+            Top = 351
+            Width = 83
+            Height = 42
+            Anchors = [akTop, akRight]
+            Caption = 'Send(Async)'
+            TabOrder = 13
+            OnClick = btnSendAsyncClick
           end
         end
       end
@@ -664,6 +674,7 @@ object FormSendEmail: TFormSendEmail
     Width = 494
     Height = 19
     Align = alBottom
+    Smooth = True
     MarqueeInterval = 1
     TabOrder = 2
   end

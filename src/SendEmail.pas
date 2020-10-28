@@ -3,45 +3,15 @@ unit SendEmail;
 interface
 
 uses
-  System.SysUtils, System.StrUtils, System.Classes,
-  IdSMTP, IdSSL, IdSSLOpenSSL, IdExplicitTLSClientServerBase, IdMessage, IdMessageBuilder, idGlobal, IdComponent, IdAttachmentFile,
-  System.TypInfo;
+  System.SysUtils, System.StrUtils, System.Classes, System.TypInfo, System.Threading, System.SyncObjs,
+  IdSMTP, IdSSL, IdSSLOpenSSL, IdSSLOpenSSLHeaders, IdExplicitTLSClientServerBase, IdMessage, IdMessageBuilder, idGlobal, IdComponent, IdAttachmentFile;
 
 type
   TPriority = IdMessage.TIdMessagePriority;
   TAttachmentDisposition = (adAttachment, adInline);
   TLogMode = (lmComponent, lmLib, lmAll, lmNone);
 
-  ISendEmail = interface
-    ['{2B186D65-3B24-4D1B-B47F-9B145B59CD1F}']
-    function From(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddTo(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddReceiptRecipient(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddReplyTo(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddCC(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddBCC(const AEmail: string; const AName: string = ''): ISendEmail;
-    function Priority(const APriority: TPriority): ISendEmail;
-    function Subject(const ASubject: string): ISendEmail;
-    function AddBody(const ABody: string; const IsBodyHTML: Boolean = True): ISendEmail;
-    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): ISendEmail;
-    function Host(const AHost: string): ISendEmail;
-    function Port(const APort: Integer): ISendEmail;
-    function Auth(const AValue: Boolean): ISendEmail;
-    function UserName(const AUserName: string): ISendEmail;
-    function Password(const APassword: string): ISendEmail;
-    function SSL(const AValue: Boolean): ISendEmail;
-    function TLS(const AValue: Boolean): ISendEmail;
-    function Clear: ISendEmail;
-    function Connect: ISendEmail;
-    function Send(const ADisconnectAfterSending: Boolean = True): ISendEmail;
-    function Disconnect: ISendEmail;
-    function OnLog(const AStatus: TProc<string>; const ALogMode: TLogMode = lmComponent): ISendEmail;
-    function OnWorkBegin(const AExecute: TProc<Int64>): ISendEmail;
-    function OnWork(const AExecute: TProc<Int64>): ISendEmail;
-    function OnWorkEnd(const AExecute: TProc): ISendEmail;
-  end;
-
-  TSendEmail = class(TInterfacedObject, ISendEmail)
+  TSendEmail = class
   private
     FIdSMTP: TIdSMTP;
     FIdSSLOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
@@ -61,6 +31,9 @@ type
     FSendMaxReconnection: Integer;
     FSendCountReconnect: Integer;
 
+    class var RW: TMultiReadExclusiveWriteSynchronizer;
+    class var FInstance: TSendEmail;
+
     function IsConnected: Boolean;
     procedure Reconnect(AResend: Boolean = False);
 
@@ -72,53 +45,70 @@ type
     procedure Work(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
     procedure WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
   public
-    function From(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddTo(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddReceiptRecipient(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddReplyTo(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddCC(const AEmail: string; const AName: string = ''): ISendEmail;
-    function AddBCC(const AEmail: string; const AName: string = ''): ISendEmail;
-    function Priority(const APriority: TPriority): ISendEmail;
-    function Subject(const ASubject: string): ISendEmail;
-    function AddBody(const ABody: string; const IsBodyHTML: Boolean = True): ISendEmail;
-    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): ISendEmail;
-    function Host(const AHost: string): ISendEmail;
-    function Port(const APort: Integer): ISendEmail;
-    function Auth(const AValue: Boolean): ISendEmail;
-    function UserName(const AUserName: string): ISendEmail;
-    function Password(const APassword: string): ISendEmail;
-    function SSL(const AValue: Boolean): ISendEmail;
-    function TLS(const AValue: Boolean): ISendEmail;
-    function Clear: ISendEmail;
-    function Connect: ISendEmail;
-    function Send(const ADisconnectAfterSending: Boolean = True): ISendEmail;
-    function Disconnect: ISendEmail;
-    function OnLog(const AStatus: TProc<string>; const ALogMode: TLogMode = lmComponent): ISendEmail;
-    function OnWorkBegin(const AExecute: TProc<Int64>): ISendEmail;
-    function OnWork(const AExecute: TProc<Int64>): ISendEmail;
-    function OnWorkEnd(const AExecute: TProc): ISendEmail;
+    function From(const AEmail: string; const AName: string = ''): TSendEmail;
+    function AddTo(const AEmail: string; const AName: string = ''): TSendEmail;
+    function AddReceiptRecipient(const AEmail: string; const AName: string = ''): TSendEmail;
+    function AddReplyTo(const AEmail: string; const AName: string = ''): TSendEmail;
+    function AddCC(const AEmail: string; const AName: string = ''): TSendEmail;
+    function AddBCC(const AEmail: string; const AName: string = ''): TSendEmail;
+    function Priority(const APriority: TPriority): TSendEmail;
+    function Subject(const ASubject: string): TSendEmail;
+    function Message(const AMessage: string; const IsBodyHTML: Boolean = True): TSendEmail;
+    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): TSendEmail;
+    function Host(const AHost: string): TSendEmail;
+    function Port(const APort: Integer): TSendEmail;
+    function Auth(const AValue: Boolean): TSendEmail;
+    function UserName(const AUserName: string): TSendEmail;
+    function Password(const APassword: string): TSendEmail;
+    function SSL(const AValue: Boolean): TSendEmail;
+    function TLS(const AValue: Boolean): TSendEmail;
+    function Clear: TSendEmail;
+    function Connect: TSendEmail;
+    function Send(const ADisconnectAfterSending: Boolean = True): TSendEmail;
+    function SendAsync(const ACallBack: TProc<Boolean, string> = nil; const ADisconnectAfterSending: Boolean = True): TSendEmail;
+    function Disconnect: TSendEmail;
+
+    function OnLog(const AExecute: TProc<string>; const ALogMode: TLogMode = lmComponent): TSendEmail;
+    function OnWorkBegin(const AExecute: TProc<Int64>): TSendEmail;
+    function OnWork(const AExecute: TProc<Int64>): TSendEmail;
+    function OnWorkEnd(const AExecute: TProc): TSendEmail;
 
     constructor Create;
     destructor Destroy; override;
 
-    class function New: ISendEmail;
+    class function New: TSendEmail;
+    class destructor UnInitialize;
   end;
 
 implementation
 
 { TSendEmail }
 
-class function TSendEmail.New: ISendEmail;
+class function TSendEmail.New: TSendEmail;
 begin
-  Result := TSendEmail.Create;
+  if not Assigned(FInstance) then
+    FInstance := TSendEmail.Create;
+
+  Result := FInstance;
+end;
+
+class destructor TSendEmail.UnInitialize;
+begin
+  if Assigned(FInstance) then
+    try
+      FInstance.OnLog(nil);
+      FInstance.Disconnect;
+    finally
+      FreeAndNil(FInstance);
+    end;
 end;
 
 constructor TSendEmail.Create;
 begin
-  FIdSMTP := TIdSMTP.Create(nil);
-  FIdSSLOpenSSL := TIdSSLIOHandlerSocketOpenSSL.Create(FIdSMTP);
+  FIdSMTP := TIdSMTP.Create;
+  FIdSSLOpenSSL := TIdSSLIOHandlerSocketOpenSSL.Create;
   FidMessageBuilderHTML := TIdMessageBuilderHtml.Create;
-  FIdMessage := TIdMessage.Create(nil);
+  FIdMessage := TIdMessage.Create;
   FMessageStream := TMemoryStream.Create;
 
   FLogExecute := nil;
@@ -130,7 +120,6 @@ begin
 
   FConnectMaxReconnection := 5;
   FConnectCountReconnect := 0;
-
   FSendMaxReconnection := 5;
   FSendCountReconnect := 0;
 
@@ -187,7 +176,7 @@ begin
   inherited;
 end;
 
-function TSendEmail.From(const AEmail, AName: string): ISendEmail;
+function TSendEmail.From(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -200,7 +189,7 @@ begin
   Log(Format('From: %s', [AEmail]));
 end;
 
-function TSendEmail.AddTo(const AEmail, AName: string): ISendEmail;
+function TSendEmail.AddTo(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -216,7 +205,7 @@ begin
   Log(Format('To(%d): %s', [FIdMessage.Recipients.Count, AEmail]));
 end;
 
-function TSendEmail.AddReceiptRecipient(const AEmail, AName: string): ISendEmail;
+function TSendEmail.AddReceiptRecipient(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -229,7 +218,7 @@ begin
   Log(Format('ReceiptRecipient: %s', [AEmail]));
 end;
 
-function TSendEmail.AddReplyTo(const AEmail, AName: string): ISendEmail;
+function TSendEmail.AddReplyTo(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -245,7 +234,7 @@ begin
   Log(Format('ReplyTo(%d): %s', [FIdMessage.ReplyTo.Count, AEmail]));
 end;
 
-function TSendEmail.AddCC(const AEmail, AName: string): ISendEmail;
+function TSendEmail.AddCC(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -261,7 +250,7 @@ begin
   Log(Format('CC(%d): %s', [FIdMessage.CCList.Count, AEmail]));
 end;
 
-function TSendEmail.AddBCC(const AEmail, AName: string): ISendEmail;
+function TSendEmail.AddBCC(const AEmail, AName: string): TSendEmail;
 begin
   Result := Self;
 
@@ -277,7 +266,7 @@ begin
   Log(Format('BCC(%d): %s', [FIdMessage.BCCList.Count, AEmail]));
 end;
 
-function TSendEmail.Priority(const APriority: TPriority): ISendEmail;
+function TSendEmail.Priority(const APriority: TPriority): TSendEmail;
 begin
   Result := Self;
   FIdMessage.Priority := APriority;
@@ -285,7 +274,7 @@ begin
   Log(Format('Priority: %s', [GetEnumName(TypeInfo(TPriority), Integer(APriority))]));
 end;
 
-function TSendEmail.Subject(const ASubject: string): ISendEmail;
+function TSendEmail.Subject(const ASubject: string): TSendEmail;
 begin
   Result := Self;
   FIdMessage.Subject := ASubject;
@@ -293,25 +282,25 @@ begin
   Log(Format('Subject: %s', [ASubject]));
 end;
 
-function TSendEmail.AddBody(const ABody: string; const IsBodyHTML: Boolean = True): ISendEmail;
+function TSendEmail.Message(const AMessage: string; const IsBodyHTML: Boolean = True): TSendEmail;
 begin
   Result := Self;
 
   if IsBodyHTML then
   begin
-    FidMessageBuilderHTML.Html.Add(ABody);
+    FidMessageBuilderHTML.Html.Text := AMessage;
     FidMessageBuilderHTML.HtmlCharSet := 'utf-8';
     FidMessageBuilderHTML.HtmlContentTransfer := 'base64'; // quoted-printable
   end
   else
   begin
-    FidMessageBuilderHTML.PlainText.Add(ABody);
+    FidMessageBuilderHTML.PlainText.Text := AMessage;
     FidMessageBuilderHTML.PlainTextCharSet := 'utf-8';
     FidMessageBuilderHTML.PlainTextContentTransfer := 'base64'; // quoted-printable
   end;
 end;
 
-function TSendEmail.AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): ISendEmail;
+function TSendEmail.AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): TSendEmail;
 begin
   Result := Self;
 
@@ -338,21 +327,21 @@ begin
   end;
 end;
 
-function TSendEmail.Host(const AHost: string): ISendEmail;
+function TSendEmail.Host(const AHost: string): TSendEmail;
 begin
   Result := Self;
   FIdSMTP.Host := AHost;
   Log(Format('Host: %s', [AHost]));
 end;
 
-function TSendEmail.Port(const APort: Integer): ISendEmail;
+function TSendEmail.Port(const APort: Integer): TSendEmail;
 begin
   Result := Self;
   FIdSMTP.Port := APort;
   Log(Format('Port: %d', [APort]));
 end;
 
-function TSendEmail.Auth(const AValue: Boolean): ISendEmail;
+function TSendEmail.Auth(const AValue: Boolean): TSendEmail;
 begin
   Result := Self;
 
@@ -364,33 +353,33 @@ begin
   Log(Format('Auth: %s', [IfThen(AValue, 'True', 'False')]));
 end;
 
-function TSendEmail.UserName(const AUserName: string): ISendEmail;
+function TSendEmail.UserName(const AUserName: string): TSendEmail;
 begin
   Result := Self;
   FIdSMTP.UserName := AUserName;
   Log(Format('UserName: %s', [AUserName]));
 end;
 
-function TSendEmail.Password(const APassword: string): ISendEmail;
+function TSendEmail.Password(const APassword: string): TSendEmail;
 begin
   Result := Self;
   FIdSMTP.Password := APassword;
   Log(Format('Password: %s', ['********']));
 end;
 
-function TSendEmail.SSL(const AValue: Boolean): ISendEmail;
+function TSendEmail.SSL(const AValue: Boolean): TSendEmail;
 begin
   Result := Self;
   FSSL := AValue;
 end;
 
-function TSendEmail.TLS(const AValue: Boolean): ISendEmail;
+function TSendEmail.TLS(const AValue: Boolean): TSendEmail;
 begin
   Result := Self;
   FTLS := AValue;
 end;
 
-function TSendEmail.Clear: ISendEmail;
+function TSendEmail.Clear: TSendEmail;
 begin
   Result := Self;
 
@@ -400,7 +389,7 @@ begin
   FidMessageBuilderHTML.Clear;
 end;
 
-function TSendEmail.Connect: ISendEmail;
+function TSendEmail.Connect: TSendEmail;
 var
   LLastResult: string;
 begin
@@ -456,9 +445,12 @@ begin
     FIdSMTP.Connect;
     Log('Connected');
 
-    Log('Authenticating');
-    FIdSMTP.Authenticate;
-    Log('Authenticated');
+    if FIdSMTP.AuthType <> satNone then
+    begin
+      Log('Authenticating');
+      FIdSMTP.Authenticate;
+      Log('Authenticated');
+    end;
 
     FConnectCountReconnect := 0;
   except
@@ -476,7 +468,7 @@ begin
           begin
             Sleep(100);
             Inc(FConnectCountReconnect);
-            Reconnect;
+            Reconnect(False);
             Exit;
           end
           else
@@ -500,10 +492,10 @@ begin
         if E.Message.ToUpper.Contains('SOCKET ERROR # 11001') then
           raise Exception.Create('Host not found!');
 
-        if LLastResult.Contains(E.Message) then
-          raise Exception.Create(E.Message)
+        if LLastResult.Contains(E.Message) and not LLastResult.Trim.IsEmpty then
+          raise Exception.Create(LLastResult + sLineBreak + 'Message: ' + E.Message)
         else
-          raise Exception.Create(LLastResult + sLineBreak + 'Message: ' + E.Message);
+          raise Exception.Create(E.Message);
       except
         on E: Exception do
         begin
@@ -516,7 +508,7 @@ begin
   end;
 end;
 
-function TSendEmail.Send(const ADisconnectAfterSending: Boolean = True): ISendEmail;
+function TSendEmail.Send(const ADisconnectAfterSending: Boolean = True): TSendEmail;
 begin
   Result := Self;
 
@@ -557,28 +549,61 @@ begin
         end;
 
         if E.Message.ToUpper.Contains('NOT CONNECTED') then
-          raise Exception.Create('Not Connected to Internet!');
+          raise Exception.Create('Not connected to internet!');
 
         raise Exception.Create(E.Message);
       end;
     end;
   finally
-    if ADisconnectAfterSending and IsConnected then
+    if ADisconnectAfterSending then
       Disconnect;
   end;
 end;
 
-function TSendEmail.Disconnect: ISendEmail;
+function TSendEmail.SendAsync(const ACallBack: TProc<Boolean, string> = nil; const ADisconnectAfterSending: Boolean = True): TSendEmail;
 begin
   Result := Self;
 
-  try
-    Log('Disconnecting');
-    FIdSMTP.Disconnect;
-    Log('Disconnected');
-  except
-    Log('Disconnected with error');
-  end;
+  TThread.CreateAnonymousThread(
+    procedure
+    var
+      LMessage: string;
+    begin
+      RW.BeginWrite;
+      try
+        try
+          Send(ADisconnectAfterSending);
+        except
+          on E: Exception do
+            LMessage := E.Message;
+        end;
+      finally
+        RW.EndWrite;
+      end;
+
+      TThread.Synchronize(TThread.CurrentThread,
+        procedure
+        begin
+          if Assigned(ACallBack) then
+            ACallBack(not LMessage.Trim.IsEmpty, LMessage)
+          else
+            raise Exception.Create(LMessage);
+        end);
+    end).Start;
+end;
+
+function TSendEmail.Disconnect: TSendEmail;
+begin
+  Result := Self;
+
+  if IsConnected then
+    try
+      Log('Disconnecting');
+      FIdSMTP.Disconnect(False);
+      Log('Disconnected');
+    except
+      Log('Disconnected with error');
+    end;
 
   if FSSL or FTLS then
   begin
@@ -588,27 +613,27 @@ begin
   end;
 end;
 
-function TSendEmail.OnLog(const AStatus: TProc<string>; const ALogMode: TLogMode = lmComponent): ISendEmail;
+function TSendEmail.OnLog(const AExecute: TProc<string>; const ALogMode: TLogMode = lmComponent): TSendEmail;
 begin
   Result := Self;
 
-  FLogExecute := AStatus;
+  FLogExecute := AExecute;
   FLogMode := ALogMode;
 end;
 
-function TSendEmail.OnWorkBegin(const AExecute: TProc<Int64>): ISendEmail;
+function TSendEmail.OnWorkBegin(const AExecute: TProc<Int64>): TSendEmail;
 begin
   Result := Self;
   FWorkBegin := AExecute;
 end;
 
-function TSendEmail.OnWork(const AExecute: TProc<Int64>): ISendEmail;
+function TSendEmail.OnWork(const AExecute: TProc<Int64>): TSendEmail;
 begin
   Result := Self;
   FWork := AExecute;
 end;
 
-function TSendEmail.OnWorkEnd(const AExecute: TProc): ISendEmail;
+function TSendEmail.OnWorkEnd(const AExecute: TProc): TSendEmail;
 begin
   Result := Self;
   FWorkEnd := AExecute;
@@ -616,13 +641,7 @@ end;
 
 function TSendEmail.IsConnected: Boolean;
 begin
-  Result := False;
-
-  try
-    Result := FIdSMTP.Connected;
-  except
-    Disconnect;
-  end;
+  Result := FIdSMTP.Connected;
 end;
 
 procedure TSendEmail.Reconnect(AResend: Boolean = False);
@@ -681,5 +700,13 @@ begin
   if Assigned(FWorkEnd) then
     FWorkEnd;
 end;
+
+initialization
+
+TSendEmail.RW := TMultiReadExclusiveWriteSynchronizer.Create;
+
+finalization
+
+FreeAndNil(TSendEmail.RW);
 
 end.

@@ -1,9 +1,9 @@
-program Sample;
+program Model1;
 
 uses
   Vcl.Forms,
   USendEmail in 'USendEmail.pas' {FormSendEmail},
-  SendEmail in '..\src\SendEmail.pas';
+  SendEmail in '..\..\src\SendEmail.pas';
 
 {$R *.res}
 
