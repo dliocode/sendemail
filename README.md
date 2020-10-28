@@ -18,7 +18,7 @@ Function to send email for Delphi.
 
 ```delphi
 uses
-  SendEmail in '..\src\SendEmail.pas';
+  SendEmail;
 
 begin
   TSendEmail.New
@@ -30,7 +30,7 @@ begin
   .AddBCC('Email','Name')
   .Priority(TIdMessagePriority.mpNormal)
   .Subject('My Text with SendEmail')
-  .AddBody('<h1>Message</h1>', True) // True is Default = Text in HTML
+  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
   .AddAttachment('')
   .Host('email@domain.com')
   .Port(587)
@@ -47,7 +47,7 @@ end.
 
 ```delphi
 uses
-  SendEmail in '..\src\SendEmail.pas';
+  SendEmail;
 
 begin
   TSendEmail.New
@@ -65,7 +65,7 @@ begin
   .AddBCC('Email','Name')
   .Priority(TIdMessagePriority.mpNormal)
   .Subject('My Text with SendEmail')
-  .AddBody('<h1>Message</h1>', True) // True is Default = Text in HTML
+  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
   .AddAttachment('')
   .Host('email@domain.com')
   .Port(587)
@@ -78,35 +78,31 @@ begin
 end. 
 ```
 
-### :closed_book: Mode: With process bar
+### :closed_book: Mode: With progress bar
 
 ```delphi
 uses
-  SendEmail in '..\src\SendEmail.pas';
+  SendEmail;
 
 begin
-  TSendEmail.New
-  
+  TSendEmail.New  
   .OnWorkBegin(
   procedure(ACountMax: Int64)
   begin
 	ProgressBar.Position := 0;     
 	ProgressBar.Max := ACountMax;
   end)
-
   .OnWork(
   procedure(ACount: Int64)
   begin
 	ProgressBar.Position := ACount;
 	ProgressBar.Refresh;
   end)
-
   .OnWorkEnd(
   procedure
   begin
 	ProgressBar.Position := ProgressBar.Max;
-  end)  
-  
+  end)    
   .From('Email','Name')
   .AddTo('Email','Name')
   .AddReceiptRecipient('Email','Name') // Confirmation Read
@@ -115,7 +111,7 @@ begin
   .AddBCC('Email','Name')
   .Priority(TIdMessagePriority.mpNormal)
   .Subject('My Text with SendEmail')
-  .AddBody('<h1>Message</h1>', True) // True is Default = Text in HTML
+  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
   .AddAttachment('')
   .Host('email@domain.com')
   .Port(587)
@@ -128,67 +124,54 @@ begin
 end.
 ```
 
+### :notebook_with_decorative_cover: Send asynchronous mode
+
+```delphi
+uses
+  SendEmail;
+
+begin
+  TSendEmail.New
+  .From('Email','Name')
+  .AddTo('Email','Name')
+  .AddReceiptRecipient('Email','Name') // Confirmation Read
+  .AddReplyTo('Email','Name') // Answer to
+  .AddCC('Email','Name')
+  .AddBCC('Email','Name')
+  .Priority(TIdMessagePriority.mpNormal)
+  .Subject('My Text with SendEmail')
+  .Message('<h1>Message</h1>', True) // True is Default = Text in HTML
+  .AddAttachment('')
+  .Host('email@domain.com')
+  .Port(587)
+  .Auth(True)
+  .UserName('username')
+  .Password('password')
+  .SSL(False)
+  .TLS(False)
+  .SendAsync( 
+    procedure(AErro: Boolean; AMessageErro: string)  // Informed callback to return
+    begin
+      if AErro then
+        ShowMessage(AMessageErro)
+      else
+        ShowMessage('Message sent!')
+    end, True); // True is Default = After sending it will be disconnected
+end.
+```
+
+
 ## :satellite: Host SMTP
 
-### GMAIL
-
-| Host | Port | Cryptography | Auth |
-| -------------- | --- | ------- | --- |
-| smtp.gmail.com | 465 | SSL/TLS | Yes |
-
-
-### Outlook or Office 365
-
-| Host | Port | Cryptography | Auth |
-| ------------------ | --- | --- | --- |
-| smtp.office365.com | 587 | TLS | Yes |
-
-
-### HOTMAIL
-
-| Host | Port | Cryptography | Auth |
-| ------------- | --- | --- | --- |
-| smtp.live.com | 587 | TLS | Yes |
-
-
-### Yahoo
-
-| Host | Port | Cryptography | Auth |
-| ---------------------- | --- | --- | --- |
-| smtp.mail.yahoo.com.br | 587 | TLS | Yes |
-
-
-### SendGrid
-
-| Host | Port | Cryptography | Auth |
-| ----------------- | --- | --- | --- |
-| smtp.sendgrid.net | 465 | TLS | Yes |
-
-
-### Localweb
-
-| Host | Port | Cryptography | Auth |
-| ---------------- | --- | --- | --- |
-| email-ssl.com.br | 465 | TLS | Yes |
-
-
-### SparkPost
-
-| Host | Port | Cryptography | Auth |
-| ---------------------- | --- | --- | --- |
-| smtp.sparkpostmail.com | 587 | TLS | Yes |
-
-
-### Elastic Email
-
-| Host | Port | Cryptography | Auth |
-| --------------------- | --- | ---- | --- |
-| smtp.elasticemail.com | 587 | None | Yes |
-
-
-### Mail
-
-| Host | Port | Cryptography | Auth |
-| ------------ | --- | ------- | --- |
-| smtp.mail.ru | 465 | SSL/TLS | Yes |
+| **Name** | **Host** | **Port** | **Cryptography** | **Auth** |
+|  :---: |  :---: |  :---: |  :---: | :---: |
+| Gmail  | smtp.gmail.com | 465 | SSL/TLS | Yes |
+| Outlook or Office 365  | smtp.office365.com | 587 | TLS | Yes |
+| Hotmail | smtp.live.com | 587 | TLS | Yes |
+| Yahoo | smtp.mail.yahoo.com.br | 587 | TLS | Yes |
+| SendGrid | smtp.sendgrid.net | 465 | TLS | Yes |
+| LocalWeb | email-ssl.com.br | 465 | TLS | Yes |
+| SparkPost | smtp.sparkpostmail.com | 587 | TLS | Yes |
+| Elastic Email | smtp.elasticemail.com | 587 | None | Yes |
+| Mail | smtp.mail.ru | 465  | SSL/TLS | Yes |
 
