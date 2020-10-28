@@ -54,7 +54,7 @@ begin
     .OnLog(
     procedure(ALog: string)
     begin
-      memoLog.Lines.Add(Format('%s ' + ALog, [FormatDateTime('dd/mm/yyyy hh:MM:ss', Now)]));
+      Writeln(Format('%s ' + ALog, [FormatDateTime('dd/mm/yyyy hh:MM:ss', Now)]));
     end,
     TLogMode.lmLib) // Options: lmComponent, lmLib, lmAll, lmNone
     .From('Email', 'Name')
