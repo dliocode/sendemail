@@ -434,9 +434,6 @@ function TSendEmail.Clear: TSendEmail;
 begin
   Result := Self;
 
-  if IsConnected then
-    Disconnect;
-
   FIdMessage.ClearHeader;
   FIdMessage.Body.Clear;
   FIdMessage.MessageParts.Clear;
@@ -448,6 +445,9 @@ var
   LLastResult: string;
 begin
   Result := Self;
+
+  if IsConnected then
+    Exit;
 
   if FSSL or FTLS then
   begin
@@ -482,7 +482,7 @@ begin
 
     FIdSMTP.IOHandler := FIdSSLOpenSSL;
 
-    if (MatchText(FIdSMTP.Port.ToString, ['25', '587', '2587'])) then
+    if MatchText(FIdSMTP.Port.ToString, ['25', '587', '2587']) then
       FIdSMTP.UseTLS := utUseExplicitTLS
     else
       FIdSMTP.UseTLS := utUseImplicitTLS;
@@ -584,8 +584,7 @@ begin
         Log(E.Message, True);
 
         if E.Message.ToUpper.Contains('CLOSING CONNECTION') or
-          E.Message.ToUpper.Contains('TOO MANY MESSAGES IN THIS CONNECTION') or
-          E.Message.ToUpper.Contains('SSL3_GET_RECORD')
+          E.Message.ToUpper.Contains('TOO MANY MESSAGES')
         then
         begin
           if FSendCountReconnect < FSendMaxReconnection then
@@ -701,15 +700,17 @@ begin
     Result := FIdSMTP.Connected;
   except
     on E: Exception do
-      if E.Message.ToUpper.Contains('SSL3_GET_RECORD') then
-      begin
+    begin
+      if E.Message.ToUpper.Contains('CLOSING CONNECTION') or
+        E.Message.ToUpper.Contains('SSL3_GET_RECORD')
+      then
         try
           Reconnect(False);
           Result := True;
         except
           Exit;
         end;
-      end;
+    end;
   end;
 end;
 
