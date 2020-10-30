@@ -63,6 +63,7 @@ type
     function SSL(const AValue: Boolean): TSendEmail;
     function TLS(const AValue: Boolean): TSendEmail;
     function Clear: TSendEmail;
+    function ClearRecipient: TSendEmail;
     function Connect: TSendEmail;
     function Send(const ADisconnectAfterSending: Boolean = True): TSendEmail;
     function SendAsync(const ACallBack: TProc<Boolean, string> = nil; const ADisconnectAfterSending: Boolean = True): TSendEmail;
@@ -436,6 +437,20 @@ begin
 
   FIdMessage.ClearHeader;
   FIdMessage.Body.Clear;
+  FIdMessage.MessageParts.Clear;
+  FidMessageBuilderHTML.Clear;
+end;
+
+function TSendEmail.ClearRecipient: TSendEmail;
+begin
+  Result := Self;
+
+  FIdMessage.Recipients.Clear;
+  FIdMessage.ReceiptRecipient.Text := '';
+  FIdMessage.ReplyTo.Clear;
+  FIdMessage.CCList.Clear;
+  FIdMessage.BCCList.Clear;
+  FIdMessage.Subject := '';
   FIdMessage.MessageParts.Clear;
   FidMessageBuilderHTML.Clear;
 end;
