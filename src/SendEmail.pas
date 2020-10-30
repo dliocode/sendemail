@@ -435,6 +435,7 @@ function TSendEmail.Clear: TSendEmail;
 begin
   Result := Self;
 
+  Priority(mpNormal);
   FIdMessage.ClearHeader;
   FIdMessage.Body.Clear;
   FIdMessage.MessageParts.Clear;
