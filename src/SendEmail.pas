@@ -445,6 +445,7 @@ function TSendEmail.ClearRecipient: TSendEmail;
 begin
   Result := Self;
 
+  Priority(mpNormal);
   FIdMessage.Recipients.Clear;
   FIdMessage.ReceiptRecipient.Text := '';
   FIdMessage.ReplyTo.Clear;
