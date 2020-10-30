@@ -571,7 +571,7 @@ begin
         on E: Exception do
         begin
           Log(E.Message, True);
-          Log('Email not sent');
+          Log('Email not connected!');
           raise;
         end;
       end;
