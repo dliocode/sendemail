@@ -142,6 +142,7 @@ begin
     OnWork := Work;
     OnWorkEnd := WorkEnd;
     ManagedIOHandler := True;
+    PipeLine := False;
   end;
 
   with FIdSSLOpenSSL do
@@ -570,7 +571,7 @@ begin
       except
         on E: Exception do
         begin
-          Log(E.Message, True);
+          Log('Except: ' + E.Message, True);
           Log('Email not connected!');
           raise;
         end;
@@ -598,9 +599,10 @@ begin
     except
       on E: Exception do
       begin
-        Log(E.Message, True);
+        Log('Except: ' + E.Message, True);
 
-        if E.Message.ToUpper.Contains('CLOSING CONNECTION') or
+        if
+          E.Message.ToUpper.Contains('CLOSING CONNECTION') or
           E.Message.ToUpper.Contains('TOO MANY MESSAGES')
         then
         begin
@@ -620,6 +622,22 @@ begin
 
         if E.Message.ToUpper.Contains('NOT CONNECTED') then
           raise Exception.Create('Not connected to internet!');
+
+        if
+          E.Message.ToUpper.Contains('NO SUCH USER HERE') or
+          E.Message.ToUpper.Contains('USER UNKNOWN') or
+          E.Message.ToUpper.Contains('MAILBOX UNAVAILABLE')
+        then
+          raise Exception.Create('The recipient''s mailbox does not exist in the destination domain. It was probably typed incorrectly!');
+
+        if
+          E.Message.ToUpper.Contains('MAILBOX IS FULL') or
+          E.Message.ToUpper.Contains('MAIL QUOTA EXCEEDED') or
+          E.Message.ToUpper.Contains('MAILBOX FULL') or
+          E.Message.ToUpper.Contains('DISK QUOTA EXCEEDED') or
+          E.Message.ToUpper.Contains('USER IS OVER THE QUOTA')
+        then
+          raise Exception.Create('It means that the recipient''s inbox is full and cannot receive any more messages!');
 
         raise Exception.Create(E.Message);
       end;
@@ -672,7 +690,7 @@ begin
       FIdSMTP.Disconnect(False);
       Log('Disconnected');
     except
-      Log('Disconnected with error');
+      Log('Except: Disconnected with error');
     end;
 
   if FSSL or FTLS then
