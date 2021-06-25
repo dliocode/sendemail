@@ -1,10 +1,20 @@
-<p align="center"><br>
-  <img src="https://github.com/dliocode/SendEmail/blob/main/SendEmail.jpg"><br>
-</p> 
+<p align="center">
+  <a href="https://user-images.githubusercontent.com/54585337/123355484-2296e300-d53c-11eb-8d87-698741a9def5.png">
+    <img alt="datalogger" src="https://user-images.githubusercontent.com/54585337/123355484-2296e300-d53c-11eb-8d87-698741a9def5.png">
+  </a>  
+</p>
+<br>
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/dliocode/sendemail?style=flat-square">
+  <img src="https://img.shields.io/github/stars/dliocode/sendemail?style=flat-square">
+  <img src="https://img.shields.io/github/forks/dliocode/sendemail?style=flat-square">
+  <img src="https://img.shields.io/github/contributors/dliocode/sendemail?color=orange&style=flat-square">
+  <img src="https://tokei.rs/b1/github/dliocode/sendemail?color=red&category=lines">
+  <img src="https://tokei.rs/b1/github/dliocode/sendemail?color=green&category=code">
+  <img src="https://tokei.rs/b1/github/dliocode/sendemail?color=yellow&category=files">
+</p>
 
-## :mailbox: Send Email
-
-![](https://img.shields.io/github/stars/dliocode/SendEmail.svg) ![](https://img.shields.io/github/forks/dliocode/SendEmail.svg) ![](https://img.shields.io/github/v/tag/dliocode/SendEmail.svg) ![](https://img.shields.io/github/release/dliocode/SendEmail.svg) ![](https://img.shields.io/github/issues/dliocode/SendEmail.svg)
+## SendEmail
 
 Support: developer.dlio@gmail.com
 
