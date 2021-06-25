@@ -16,17 +16,11 @@
 
 ## SendEmail
 
-Support: developer.dlio@gmail.com
-
 Function to send email for Delphi.
 
-:fast_forward: Here is an example [Samples](https://github.com/dliocode/SendEmail/tree/main/samples)
+Support: developer.dlio@gmail.com
 
-
-### Donation
-
-If this project help you reduce time to develop, you can give me a cup of coffee :) <a href="https://www.paypal.com/donate?hosted_button_id=2T7W4PL7YGJZW" target="_blank" rel="noopener noreferrer"><img width="150" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"></a>
-
+:fast_forward: Here is an example [Samples](https://github.com/dliocode/sendemail/tree/main/samples)
 
 ## :warning: Usage
 
