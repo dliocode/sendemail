@@ -34,7 +34,6 @@ type
     class var RW: TMultiReadExclusiveWriteSynchronizer;
     class var FInstance: TSendEmail;
 
-    function IsConnected: Boolean;
     procedure Reconnect(AResend: Boolean = False);
 
     procedure LogSMTPStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
@@ -68,6 +67,7 @@ type
     function Send(const ADisconnectAfterSending: Boolean = True): TSendEmail;
     function SendAsync(const ACallBack: TProc<Boolean, string> = nil; const ADisconnectAfterSending: Boolean = True): TSendEmail;
     function Disconnect: TSendEmail;
+    function IsConnected: Boolean;
 
     function OnLog(const AExecute: TProc<string>; const ALogMode: TLogMode = lmComponent): TSendEmail;
     function OnWorkBegin(const AExecute: TProc<Int64>): TSendEmail;
@@ -701,6 +701,28 @@ begin
   end;
 end;
 
+function TSendEmail.IsConnected: Boolean;
+begin
+  Result := False;
+
+  try
+    Result := FIdSMTP.Connected;
+  except
+    on E: Exception do
+    begin
+      if E.Message.ToUpper.Contains('CLOSING CONNECTION') or
+        E.Message.ToUpper.Contains('SSL3_GET_RECORD')
+      then
+        try
+          Reconnect(False);
+          Result := True;
+        except
+          Exit;
+        end;
+    end;
+  end;
+end;
+
 function TSendEmail.OnLog(const AExecute: TProc<string>; const ALogMode: TLogMode = lmComponent): TSendEmail;
 begin
   Result := Self;
@@ -725,28 +747,6 @@ function TSendEmail.OnWorkEnd(const AExecute: TProc): TSendEmail;
 begin
   Result := Self;
   FWorkEnd := AExecute;
-end;
-
-function TSendEmail.IsConnected: Boolean;
-begin
-  Result := False;
-
-  try
-    Result := FIdSMTP.Connected;
-  except
-    on E: Exception do
-    begin
-      if E.Message.ToUpper.Contains('CLOSING CONNECTION') or
-        E.Message.ToUpper.Contains('SSL3_GET_RECORD')
-      then
-        try
-          Reconnect(False);
-          Result := True;
-        except
-          Exit;
-        end;
-    end;
-  end;
 end;
 
 procedure TSendEmail.Reconnect(AResend: Boolean = False);
