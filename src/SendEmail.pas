@@ -532,7 +532,10 @@ begin
       begin
         LLastResult := Format('Last Result: %s', [FIdSMTP.LastCmdResult.FormattedReply.Text]);
 
-        if LLastResult.ToUpper.Contains('AUTHENTICATION SUCCEEDED') or LLastResult.Contains('250 OK') then
+        if
+          LLastResult.ToUpper.Contains('AUTHENTICATION SUCCEEDED') or
+          LLastResult.Contains('250 OK')
+        then
         begin
           Log(LLastResult, True);
 
@@ -603,7 +606,8 @@ begin
 
         if
           E.Message.ToUpper.Contains('CLOSING CONNECTION') or
-          E.Message.ToUpper.Contains('TOO MANY MESSAGES')
+          E.Message.ToUpper.Contains('TOO MANY MESSAGES') or
+          E.Message.ToUpper.Contains('CONNECTION CLOSED')
         then
         begin
           if FSendCountReconnect < FSendMaxReconnection then
@@ -758,6 +762,7 @@ begin
 
   Disconnect;
   Connect;
+
   if AResend then
     Send;
 end;
