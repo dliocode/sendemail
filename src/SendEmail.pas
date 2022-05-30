@@ -1,3 +1,10 @@
+{
+  *************************************
+  Created by Danilo Lucas
+  Github - https://github.com/dliocode
+  *************************************
+}
+
 unit SendEmail;
 
 interface
@@ -132,11 +139,11 @@ begin
 
   with FIdSMTP do
   begin
-    MailAgent := 'SendEmail';
+    MailAgent := 'SendEmail-https://github.com/dliocode/sendemail';
     ConnectTimeout := 60000;
     ReadTimeout := 60000;
     UseEhlo := True;
-    HeloName := 'SendEmail';
+    HeloName := 'SendEmail-https://github.com/dliocode/sendemail';
     OnStatus := LogSMTPStatus;
     OnWorkBegin := WorkBegin;
     OnWork := Work;
