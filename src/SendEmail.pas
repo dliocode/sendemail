@@ -139,11 +139,11 @@ begin
 
   with FIdSMTP do
   begin
-    MailAgent := 'SendEmail-https://github.com/dliocode/sendemail';
+    MailAgent := 'SendEmail';
     ConnectTimeout := 60000;
     ReadTimeout := 60000;
     UseEhlo := True;
-    HeloName := 'SendEmail-https://github.com/dliocode/sendemail';
+    HeloName := 'SendEmail';
     OnStatus := LogSMTPStatus;
     OnWorkBegin := WorkBegin;
     OnWork := Work;
