@@ -234,6 +234,8 @@ var
   I: Integer;
 begin
   TSendEmail.New
+    .Clear
+
     .OnLog(
     procedure(ALog: string)
     begin
