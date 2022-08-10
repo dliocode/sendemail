@@ -143,7 +143,6 @@ begin
     ConnectTimeout := 60000;
     ReadTimeout := 60000;
     UseEhlo := True;
-    HeloName := 'SendEmail';
     OnStatus := LogSMTPStatus;
     OnWorkBegin := WorkBegin;
     OnWork := Work;
@@ -487,23 +486,20 @@ begin
     Log('Loading DLL');
     if not LoadOpenSSLLibrary then
     begin
-      Log('DLL''s not compatible or not found (ssleay32 e libeay32)');
-      raise Exception.Create('DLL''s not compatible or not found (ssleay32 e libeay32)');
+      Log(WhichFailedToLoad);
+      raise Exception.Create(Self.ClassName + ' > ' + WhichFailedToLoad);
     end;
     Log('Loaded DLL');
 
-    with FIdSSLOpenSSL do
-    begin
-      if FSSL then
-        SSLOptions.Method := SslvSSLv23;
+    if FSSL then
+      FIdSSLOpenSSL.SSLOptions.Method := SslvSSLv23;
 
-      if FTLS then
-        SSLOptions.Method := SslvTLSv1_2;
+    if FTLS then
+      FIdSSLOpenSSL.SSLOptions.Method := SslvTLSv1_2;
 
-      Destination := FIdSMTP.Host + ':' + FIdSMTP.Port.ToString;
-      Host := FIdSMTP.Host;
-      Port := FIdSMTP.Port;
-    end;
+    FIdSSLOpenSSL.Destination := FIdSMTP.Host + ':' + FIdSMTP.Port.ToString;
+    FIdSSLOpenSSL.Host := FIdSMTP.Host;
+    FIdSSLOpenSSL.Port := FIdSMTP.Port;
 
     FIdSMTP.IOHandler := FIdSSLOpenSSL;
 
@@ -515,7 +511,7 @@ begin
   else
   begin
     Log('Defining encryption: None');
-    FIdSMTP.IOHandler := TIdIOHandler.MakeDefaultIOHandler(nil);
+    FIdSMTP.IOHandler := nil;
     FIdSMTP.UseTLS := UtNoTLSSupport;
   end;
 
@@ -703,13 +699,6 @@ begin
     except
       Log('Except: Disconnected with error');
     end;
-
-  if FSSL or FTLS then
-  begin
-    Log('UnLoading DLL');
-    UnLoadOpenSSLLibrary;
-    Log('UnLoaded DLL');
-  end;
 end;
 
 function TSendEmail.IsConnected: Boolean;
