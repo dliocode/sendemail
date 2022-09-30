@@ -41,7 +41,7 @@ object FormSendEmail: TFormSendEmail
     Align = alClient
     BevelOuter = bvNone
     Caption = 'pnlStatus'
-    TabOrder = 1
+    TabOrder = 3
     object PageControlSendEmail: TPageControl
       Left = 0
       Top = 0
@@ -194,7 +194,7 @@ object FormSendEmail: TFormSendEmail
             Height = 22
             Style = csOwnerDrawFixed
             Anchors = [akTop, akRight]
-            TabOrder = 2
+            TabOrder = 3
             Items.Strings = (
               'None'
               'SSL'
@@ -207,7 +207,7 @@ object FormSendEmail: TFormSendEmail
             Width = 225
             Height = 21
             CharCase = ecLowerCase
-            TabOrder = 6
+            TabOrder = 7
           end
           object edtPassword: TEdit
             Left = 244
@@ -215,7 +215,7 @@ object FormSendEmail: TFormSendEmail
             Width = 225
             Height = 21
             PasswordChar = '*'
-            TabOrder = 7
+            TabOrder = 8
           end
           object edtHost: TEdit
             Left = 10
@@ -224,7 +224,7 @@ object FormSendEmail: TFormSendEmail
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             CharCase = ecLowerCase
-            TabOrder = 3
+            TabOrder = 4
           end
           object edtPort: TEdit
             Left = 357
@@ -233,7 +233,7 @@ object FormSendEmail: TFormSendEmail
             Height = 21
             Anchors = [akTop, akRight]
             CharCase = ecLowerCase
-            TabOrder = 4
+            TabOrder = 5
           end
           object edtFrom: TEdit
             Left = 10
@@ -242,7 +242,7 @@ object FormSendEmail: TFormSendEmail
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             CharCase = ecLowerCase
-            TabOrder = 0
+            TabOrder = 1
           end
           object cmbAuth: TComboBox
             Left = 403
@@ -251,7 +251,7 @@ object FormSendEmail: TFormSendEmail
             Height = 21
             Anchors = [akTop, akRight]
             ItemIndex = 0
-            TabOrder = 5
+            TabOrder = 6
             Text = 'No'
             Items.Strings = (
               'No'
@@ -263,7 +263,7 @@ object FormSendEmail: TFormSendEmail
             Width = 341
             Height = 21
             Anchors = [akLeft, akTop, akRight]
-            TabOrder = 1
+            TabOrder = 2
           end
           object pnlHeaderEmailConfiguration: TPanel
             Left = 0
@@ -282,7 +282,7 @@ object FormSendEmail: TFormSendEmail
             Font.Style = [fsBold]
             ParentBackground = False
             ParentFont = False
-            TabOrder = 8
+            TabOrder = 0
           end
           object ragLoadSettings: TRadioGroup
             Left = 10
@@ -302,7 +302,7 @@ object FormSendEmail: TFormSendEmail
               'SparkPost'
               'Elastic Email'
               'Mail')
-            TabOrder = 9
+            TabOrder = 11
             OnClick = ragLoadSettingsClick
           end
           object chkReceiptRecipient: TCheckBox
@@ -320,7 +320,7 @@ object FormSendEmail: TFormSendEmail
             Height = 22
             Style = csOwnerDrawFixed
             ItemIndex = 1
-            TabOrder = 11
+            TabOrder = 9
             Text = 'tLib'
             Items.Strings = (
               'tComponent'
@@ -471,7 +471,7 @@ object FormSendEmail: TFormSendEmail
             Width = 239
             Height = 21
             CharCase = ecLowerCase
-            TabOrder = 0
+            TabOrder = 1
           end
           object mmMessage: TMemo
             Left = 10
@@ -480,10 +480,10 @@ object FormSendEmail: TFormSendEmail
             Height = 87
             Anchors = [akLeft, akTop, akRight]
             Lines.Strings = (
-              'Texto normal'
+              'Plain Text'
               ''
-              '<h1>Texto com HTML</h1>')
-            TabOrder = 8
+              '<h1>Text with HTML</h1>')
+            TabOrder = 12
           end
           object edtToName: TEdit
             Left = 255
@@ -491,7 +491,7 @@ object FormSendEmail: TFormSendEmail
             Width = 217
             Height = 21
             Anchors = [akLeft, akTop, akRight]
-            TabOrder = 1
+            TabOrder = 2
           end
           object edtSubject: TEdit
             Left = 10
@@ -499,7 +499,7 @@ object FormSendEmail: TFormSendEmail
             Width = 373
             Height = 21
             Anchors = [akLeft, akTop, akRight]
-            TabOrder = 6
+            TabOrder = 7
           end
           object Panel1: TPanel
             Left = 0
@@ -518,7 +518,7 @@ object FormSendEmail: TFormSendEmail
             Font.Style = [fsBold]
             ParentBackground = False
             ParentFont = False
-            TabOrder = 9
+            TabOrder = 0
           end
           object edtCc: TEdit
             Left = 10
@@ -526,7 +526,7 @@ object FormSendEmail: TFormSendEmail
             Width = 239
             Height = 21
             CharCase = ecLowerCase
-            TabOrder = 2
+            TabOrder = 3
           end
           object edtCcName: TEdit
             Left = 255
@@ -534,7 +534,7 @@ object FormSendEmail: TFormSendEmail
             Width = 217
             Height = 21
             Anchors = [akLeft, akTop, akRight]
-            TabOrder = 3
+            TabOrder = 4
           end
           object edtBcc: TEdit
             Left = 10
@@ -542,7 +542,7 @@ object FormSendEmail: TFormSendEmail
             Width = 239
             Height = 21
             CharCase = ecLowerCase
-            TabOrder = 4
+            TabOrder = 5
           end
           object edtBccName: TEdit
             Left = 255
@@ -550,7 +550,7 @@ object FormSendEmail: TFormSendEmail
             Width = 217
             Height = 21
             Anchors = [akLeft, akTop, akRight]
-            TabOrder = 5
+            TabOrder = 6
           end
           object lbAttachment: TListBox
             Left = 10
@@ -562,7 +562,7 @@ object FormSendEmail: TFormSendEmail
             ItemHeight = 13
             MultiSelect = True
             PopupMenu = PopupMenu
-            TabOrder = 10
+            TabOrder = 9
           end
           object btnSend: TButton
             Left = 387
@@ -571,17 +571,17 @@ object FormSendEmail: TFormSendEmail
             Height = 42
             Anchors = [akTop, akRight]
             Caption = 'Send'
-            TabOrder = 11
+            TabOrder = 13
             OnClick = btnSendClick
           end
           object btnAttachment: TButton
             Left = 387
             Top = 233
             Width = 83
-            Height = 49
+            Height = 24
             Anchors = [akTop, akRight]
             Caption = 'Attachment'
-            TabOrder = 12
+            TabOrder = 10
             OnClick = btnAttachmentClick
           end
           object cmbPriority: TComboBox
@@ -592,7 +592,7 @@ object FormSendEmail: TFormSendEmail
             Style = csOwnerDrawFixed
             Anchors = [akTop, akRight]
             ItemIndex = 2
-            TabOrder = 7
+            TabOrder = 8
             Text = 'mpNormal'
             Items.Strings = (
               'mpHighest'
@@ -608,8 +608,18 @@ object FormSendEmail: TFormSendEmail
             Height = 42
             Anchors = [akTop, akRight]
             Caption = 'Send(Async)'
-            TabOrder = 13
+            TabOrder = 14
             OnClick = btnSendAsyncClick
+          end
+          object btnInline: TButton
+            Left = 387
+            Top = 258
+            Width = 83
+            Height = 24
+            Anchors = [akTop, akRight]
+            Caption = 'Inline'
+            TabOrder = 11
+            OnClick = btnInlineClick
           end
         end
       end
@@ -641,7 +651,7 @@ object FormSendEmail: TFormSendEmail
             BevelInner = bvNone
             BevelOuter = bvNone
             ScrollBars = ssVertical
-            TabOrder = 0
+            TabOrder = 1
           end
           object Panel2: TPanel
             Left = 0
@@ -660,7 +670,7 @@ object FormSendEmail: TFormSendEmail
             Font.Style = [fsBold]
             ParentBackground = False
             ParentFont = False
-            TabOrder = 1
+            TabOrder = 0
           end
         end
       end
@@ -674,13 +684,31 @@ object FormSendEmail: TFormSendEmail
     Align = alBottom
     Smooth = True
     MarqueeInterval = 1
+    TabOrder = 4
+  end
+  object btnSaveConfiguration: TButton
+    Left = 390
+    Top = 15
+    Width = 102
+    Height = 25
+    Caption = 'Save Configuration'
     TabOrder = 2
+    OnClick = btnSaveConfigurationClick
+  end
+  object btnLoadConfiguration: TButton
+    Left = 288
+    Top = 15
+    Width = 102
+    Height = 25
+    Caption = 'Load Configuration'
+    TabOrder = 1
+    OnClick = btnLoadConfigurationClick
   end
   object PopupMenu: TPopupMenu
     Left = 200
     Top = 400
     object Remover1: TMenuItem
-      Caption = 'Remover'
+      Caption = 'Remove'
       OnClick = Remover1Click
     end
   end

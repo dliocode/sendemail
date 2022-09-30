@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages,
-  System.SysUtils, System.Variants, System.Classes,
+  System.SysUtils, System.StrUtils, System.Variants, System.Classes, System.IniFiles,
   Winapi.ShellAPI,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.ComCtrls,
   IdComponent, Vcl.Menus,
@@ -70,6 +70,9 @@ type
     PopupMenu: TPopupMenu;
     Remover1: TMenuItem;
     btnSendAsync: TButton;
+    btnSaveConfiguration: TButton;
+    btnLoadConfiguration: TButton;
+    btnInline: TButton;
     procedure btnAttachmentClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure pnlInfoClick(Sender: TObject);
@@ -77,6 +80,9 @@ type
     procedure Remover1Click(Sender: TObject);
     procedure btnSendClick(Sender: TObject);
     procedure btnSendAsyncClick(Sender: TObject);
+    procedure btnSaveConfigurationClick(Sender: TObject);
+    procedure btnLoadConfigurationClick(Sender: TObject);
+    procedure btnInlineClick(Sender: TObject);
   private
     { Private declarations }
     procedure LoadSettings;
@@ -96,13 +102,36 @@ implementation
 procedure TFormSendEmail.btnAttachmentClick(Sender: TObject);
 var
   LOpenDialog: TFileOpenDialog;
+  I: Integer;
 begin
   LOpenDialog := TFileOpenDialog.Create(Self);
   try
     LOpenDialog.Options := [fdoAllowMultiSelect];
     LOpenDialog.DefaultFolder := ExtractFilePath(Application.ExeName);
-    if LOpenDialog.Execute then
-      lbAttachment.Items.AddStrings(LOpenDialog.Files);
+    if not LOpenDialog.Execute then
+      Exit;
+
+    for I := 0 to Pred(LOpenDialog.Files.Count) do
+      lbAttachment.Items.Add('ATTACHMENTS=' + LOpenDialog.Files[I]);
+  finally
+    LOpenDialog.Free;
+  end;
+end;
+
+procedure TFormSendEmail.btnInlineClick(Sender: TObject);
+var
+  LOpenDialog: TFileOpenDialog;
+  I: Integer;
+begin
+  LOpenDialog := TFileOpenDialog.Create(Self);
+  try
+    LOpenDialog.Options := [fdoAllowMultiSelect];
+    LOpenDialog.DefaultFolder := ExtractFilePath(Application.ExeName);
+    if not LOpenDialog.Execute then
+      Exit;
+
+    for I := 0 to Pred(LOpenDialog.Files.Count) do
+      lbAttachment.Items.Add('INLINE=' + LOpenDialog.Files[I]);
   finally
     LOpenDialog.Free;
   end;
@@ -232,6 +261,8 @@ end;
 procedure TFormSendEmail.LoadSettings;
 var
   I: Integer;
+  LFile: string;
+  LDisposition: TAttachmentDisposition;
 begin
   TSendEmail.New
     .Clear
@@ -278,7 +309,12 @@ begin
 
   // Add Attachment
   for I := 0 to Pred(lbAttachment.Count) do
-    TSendEmail.New.AddAttachment(lbAttachment.Items.Strings[I]);
+  begin
+    LDisposition := TAttachmentDisposition(IndexStr(lbAttachment.Items.Names[I], ['ATTACHMENTS', 'INLINE']));
+    LFile := lbAttachment.Items.ValueFromIndex[I];
+
+    TSendEmail.New.AddAttachment(LFile, LDisposition);
+  end;
 
   // Configuration SMTP
   TSendEmail.New
@@ -309,6 +345,68 @@ end;
 procedure TFormSendEmail.Remover1Click(Sender: TObject);
 begin
   lbAttachment.Items.Delete(lbAttachment.ItemIndex);
+end;
+
+procedure TFormSendEmail.btnLoadConfigurationClick(Sender: TObject);
+var
+  LINI: TIniFile;
+begin
+  LINI := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'sendemail.ini');
+  try
+    edtFrom.Text := LINI.ReadString('CONFIGURATION', 'from', edtFrom.Text);
+    edtFromName.Text := LINI.ReadString('CONFIGURATION', 'from_name', edtFromName.Text);
+    cmbEncrypted.ItemIndex := LINI.ReadInteger('CONFIGURATION', 'encrypted', cmbEncrypted.ItemIndex);
+    edtHost.Text := LINI.ReadString('CONFIGURATION', 'smtp_host', edtHost.Text);
+    edtPort.Text := LINI.ReadString('CONFIGURATION', 'smtp_port', edtPort.Text);
+    cmbAuth.ItemIndex := LINI.ReadInteger('CONFIGURATION', 'smtp_auth', cmbAuth.ItemIndex);
+    edtUser.Text := LINI.ReadString('CONFIGURATION', 'smtp_user', edtUser.Text);
+    edtPassword.Text := LINI.ReadString('CONFIGURATION', 'smtp_password', edtPassword.Text);
+    chkReceiptRecipient.Checked := LINI.ReadBool('CONFIGURATION', 'read_confirmation', chkReceiptRecipient.Checked);
+    cmbLogMode.ItemIndex := LINI.ReadInteger('CONFIGURATION', 'type_log', cmbLogMode.ItemIndex);
+
+    edtTo.Text := LINI.ReadString('RECIPIENT', 'to', edtTo.Text);
+    edtToName.Text := LINI.ReadString('RECIPIENT', 'to_name', edtToName.Text);
+    edtCc.Text := LINI.ReadString('RECIPIENT', 'cc', edtCc.Text);
+    edtCcName.Text := LINI.ReadString('RECIPIENT', 'cc_name', edtCcName.Text);
+    edtBcc.Text := LINI.ReadString('RECIPIENT', 'bcc', edtBcc.Text);
+    edtBccName.Text := LINI.ReadString('RECIPIENT', 'bcc_name', edtBccName.Text);
+    edtSubject.Text := LINI.ReadString('RECIPIENT', 'subject', edtSubject.Text);
+    cmbPriority.ItemIndex := LINI.ReadInteger('RECIPIENT', 'priority', cmbPriority.ItemIndex);
+    mmMessage.Text := LINI.ReadString('RECIPIENT', 'message', mmMessage.Text);
+  finally
+    LINI.Free;
+  end;
+end;
+
+procedure TFormSendEmail.btnSaveConfigurationClick(Sender: TObject);
+var
+  LINI: TIniFile;
+begin
+  LINI := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'sendemail.ini');
+  try
+    LINI.WriteString('CONFIGURATION', 'from', edtFrom.Text);
+    LINI.WriteString('CONFIGURATION', 'from_name', edtFromName.Text);
+    LINI.WriteInteger('CONFIGURATION', 'encrypted', cmbEncrypted.ItemIndex);
+    LINI.WriteString('CONFIGURATION', 'smtp_host', edtHost.Text);
+    LINI.WriteString('CONFIGURATION', 'smtp_port', edtPort.Text);
+    LINI.WriteInteger('CONFIGURATION', 'smtp_auth', cmbAuth.ItemIndex);
+    LINI.WriteString('CONFIGURATION', 'smtp_user', edtUser.Text);
+    LINI.WriteString('CONFIGURATION', 'smtp_password', edtPassword.Text);
+    LINI.WriteBool('CONFIGURATION', 'read_confirmation', chkReceiptRecipient.Checked);
+    LINI.WriteInteger('CONFIGURATION', 'type_log', cmbLogMode.ItemIndex);
+
+    LINI.WriteString('RECIPIENT', 'to', edtTo.Text);
+    LINI.WriteString('RECIPIENT', 'to_name', edtToName.Text);
+    LINI.WriteString('RECIPIENT', 'cc', edtCc.Text);
+    LINI.WriteString('RECIPIENT', 'cc_name', edtCcName.Text);
+    LINI.WriteString('RECIPIENT', 'bcc', edtBcc.Text);
+    LINI.WriteString('RECIPIENT', 'bcc_name', edtBccName.Text);
+    LINI.WriteString('RECIPIENT', 'subject', edtSubject.Text);
+    LINI.WriteInteger('RECIPIENT', 'priority', cmbPriority.ItemIndex);
+    LINI.WriteString('RECIPIENT', 'message', mmMessage.Text);
+  finally
+    LINI.Free;
+  end;
 end;
 
 end.
