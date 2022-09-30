@@ -60,7 +60,7 @@ type
     function Priority(const APriority: TPriority): TSendEmail;
     function Subject(const ASubject: string): TSendEmail;
     function Message(const AMessage: string; const IsBodyHTML: Boolean = True): TSendEmail;
-    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): TSendEmail;
+    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail;
     function Host(const AHost: string): TSendEmail;
     function Port(const APort: Integer): TSendEmail;
     function Auth(const AValue: Boolean): TSendEmail;
@@ -327,7 +327,7 @@ begin
   Log(Format('Message: %s', [IfThen(IsBodyHTML, 'HTML', 'PlainText')]));
 end;
 
-function TSendEmail.AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adInline): TSendEmail;
+function TSendEmail.AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail;
 begin
   Result := Self;
 
@@ -346,6 +346,7 @@ begin
         FidMessageBuilderHTML.Attachments.Add(AFileName);
         Log(Format('Attachment(adAttachment)(%d): %s', [FidMessageBuilderHTML.Attachments.Count, ExtractFileName(AFileName)]));
       end;
+
     adInline:
       begin
         FidMessageBuilderHTML.HtmlFiles.Add(AFileName);
