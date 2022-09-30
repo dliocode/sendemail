@@ -336,7 +336,7 @@ begin
 
   if not FileExists(AFileName) then
   begin
-    Log('Attachment: Not found');
+    Log('Attachment: Not found - ' + ExtractFileName(AFileName));
     Exit;
   end;
 
