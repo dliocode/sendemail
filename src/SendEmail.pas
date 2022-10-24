@@ -23,7 +23,7 @@ type
     FIdSMTP: TIdSMTP;
     FIdSSLOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
     FIdMessage: TIdMessage;
-    FidMessageBuilderHTML: TIdMessageBuilderHtml;
+    FIdMessageBuilderHTML: TIdMessageBuilderHtml;
     FSSL: Boolean;
     FTLS: Boolean;
     FLogExecute: TProc<string>;
@@ -60,7 +60,8 @@ type
     function Priority(const APriority: TPriority): TSendEmail;
     function Subject(const ASubject: string): TSendEmail;
     function Message(const AMessage: string; const IsBodyHTML: Boolean = True): TSendEmail;
-    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail;
+    function AddAttachment(const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail; overload;
+    function AddAttachment(const AData: TStream; const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail; overload;
     function Host(const AHost: string): TSendEmail;
     function Port(const APort: Integer): TSendEmail;
     function Auth(const AValue: Boolean): TSendEmail;
@@ -115,7 +116,7 @@ constructor TSendEmail.Create;
 begin
   FIdSMTP := TIdSMTP.Create;
   FIdSSLOpenSSL := TIdSSLIOHandlerSocketOpenSSL.Create;
-  FidMessageBuilderHTML := TIdMessageBuilderHtml.Create;
+  FIdMessageBuilderHTML := TIdMessageBuilderHtml.Create;
   FIdMessage := TIdMessage.Create;
   FMessageStream := TMemoryStream.Create;
 
@@ -179,7 +180,7 @@ begin
   FLogExecute := nil;
 
   FreeAndNil(FMessageStream);
-  FreeAndNil(FidMessageBuilderHTML);
+  FreeAndNil(FIdMessageBuilderHTML);
   FreeAndNil(FIdMessage);
   FreeAndNil(FIdSSLOpenSSL);
   FreeAndNil(FIdSMTP);
@@ -313,15 +314,15 @@ begin
 
   if IsBodyHTML then
   begin
-    FidMessageBuilderHTML.Html.Text := AMessage;
-    FidMessageBuilderHTML.HtmlCharSet := 'utf-8';
-    FidMessageBuilderHTML.HtmlContentTransfer := 'base64'; // quoted-printable
+    FIdMessageBuilderHTML.Html.Text := AMessage;
+    FIdMessageBuilderHTML.HtmlCharSet := 'utf-8';
+    FIdMessageBuilderHTML.HtmlContentTransfer := 'base64'; // quoted-printable
   end
   else
   begin
-    FidMessageBuilderHTML.PlainText.Text := AMessage;
-    FidMessageBuilderHTML.PlainTextCharSet := 'utf-8';
-    FidMessageBuilderHTML.PlainTextContentTransfer := 'base64'; // quoted-printable
+    FIdMessageBuilderHTML.PlainText.Text := AMessage;
+    FIdMessageBuilderHTML.PlainTextCharSet := 'utf-8';
+    FIdMessageBuilderHTML.PlainTextContentTransfer := 'base64'; // quoted-printable
   end;
 
   Log(Format('Message: %s', [IfThen(IsBodyHTML, 'HTML', 'PlainText')]));
@@ -343,16 +344,53 @@ begin
   case ADisposition of
     adAttachment:
       begin
-        FidMessageBuilderHTML.Attachments.Add(AFileName);
-        Log(Format('Attachment(adAttachment)(%d): %s', [FidMessageBuilderHTML.Attachments.Count, ExtractFileName(AFileName)]));
+        FIdMessageBuilderHTML.Attachments.Add(AFileName);
+        Log(Format('Attachment(adAttachment)(%d): %s', [FIdMessageBuilderHTML.Attachments.Count, ExtractFileName(AFileName)]));
       end;
 
     adInline:
       begin
-        FidMessageBuilderHTML.HtmlFiles.Add(AFileName);
-        Log(Format('Attachment(adInline)(%d): %s', [FidMessageBuilderHTML.HtmlFiles.Count, ExtractFileName(AFileName)]));
+        FIdMessageBuilderHTML.HtmlFiles.Add(AFileName);
+        Log(Format('Attachment(adInline)(%d): %s', [FIdMessageBuilderHTML.HtmlFiles.Count, ExtractFileName(AFileName)]));
       end;
   end;
+end;
+
+function TSendEmail.AddAttachment(const AData: TStream; const AFileName: string; const ADisposition: TAttachmentDisposition = adAttachment): TSendEmail;
+var
+  LAdd: TIdMessageBuilderAttachment;
+begin
+  Result := Self;
+
+  if not Assigned(AData) then
+    Exit;
+
+  if AFileName.Trim.IsEmpty then
+    Exit;
+
+  AData.Position := 0;
+  LAdd := nil;
+
+  case ADisposition of
+    adAttachment:
+      begin
+        LAdd := FIdMessageBuilderHTML.Attachments.Add(AData, '', AFileName);
+        Log(Format('Attachment(adAttachment)(%d): %s', [FIdMessageBuilderHTML.Attachments.Count, ExtractFileName(AFileName)]));
+      end;
+
+    adInline:
+      begin
+        LAdd := FIdMessageBuilderHTML.HtmlFiles.Add(AData, '', AFileName);
+        Log(Format('Attachment(adInline)(%d): %s', [FIdMessageBuilderHTML.HtmlFiles.Count, ExtractFileName(AFileName)]));
+      end;
+  end;
+
+  if not Assigned(LAdd) then
+    Exit;
+
+  LAdd.FileName := AFileName;
+  LAdd.Name := ExtractFileName(AFileName);
+  LAdd.WantedFileName := ExtractFileName(AFileName);
 end;
 
 function TSendEmail.Host(const AHost: string): TSendEmail;
@@ -447,7 +485,7 @@ begin
   FIdMessage.ClearHeader;
   FIdMessage.Body.Clear;
   FIdMessage.MessageParts.Clear;
-  FidMessageBuilderHTML.Clear;
+  FIdMessageBuilderHTML.Clear;
 end;
 
 function TSendEmail.ClearRecipient: TSendEmail;
@@ -462,7 +500,7 @@ begin
   FIdMessage.BCCList.Clear;
   FIdMessage.Subject := '';
   FIdMessage.MessageParts.Clear;
-  FidMessageBuilderHTML.Clear;
+  FIdMessageBuilderHTML.Clear;
 end;
 
 function TSendEmail.Connect: TSendEmail;
@@ -597,7 +635,7 @@ begin
   try
     try
       Log('Sending email');
-      FidMessageBuilderHTML.FillMessage(FIdMessage);
+      FIdMessageBuilderHTML.FillMessage(FIdMessage);
       FIdMessage.SaveToStream(FMessageStream);
       FIdSMTP.Send(FIdMessage);
       Log('Email sent');
