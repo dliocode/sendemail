@@ -186,4 +186,3 @@ end.
 | SparkPost | smtp.sparkpostmail.com | 587 | TLS | Yes |
 | Elastic Email | smtp.elasticemail.com | 587 | None | Yes |
 | Mail | smtp.mail.ru | 465  | SSL/TLS | Yes |
-
