@@ -705,6 +705,8 @@ begin
     begin
       RW.BeginWrite;
       try
+        LMessage := '';
+
         try
           Send(ADisconnectAfterSending);
         except
