@@ -1,0 +1,12 @@
+{
+  "name": "sendemail",
+  "description": "Function to send email for Delphi",
+  "version": "1.0.20",
+  "homepage": "https://github.com/dliocode/sendemail",
+  "mainsrc": "src/",
+  "browsingpath": "src/",
+  "projects": [
+    "SendEmail.dproj"
+  ],
+  "dependencies": {}
+}
